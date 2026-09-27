@@ -52,7 +52,7 @@ No code change needed. In Vercel (Project → Settings → Environment Variables
 | Setting | Effect |
 |---|---|
 | `AI_PROVIDER=gemini` | Default. Uses Google Gemini. Free tier has daily limits. |
-| `GEMINI_MODEL=...` | Pick a different Gemini model (default `gemini-3.8-flash`). |
+| `GEMINI_MODELS=a,b,c` | Backup chain of Gemini models, tried in order. Default `gemini-3.5-flash-lite,gemini-3.8-flash,gemini-3.6-flash,gemini-3.1-flash-lite`. If one is busy or out of free quota, the next takes over (even partway through a request). |
 | `AI_PROVIDER=anthropic` + `ANTHROPIC_API_KEY=...` | Use Claude instead (default `claude-haiku-4-5`). Paid, about half a cent per request. |
 | `AI_PROVIDER=mock` | Fake dishes, for testing. |
 
@@ -60,5 +60,6 @@ Redeploy (`npx vercel --prod`) after changing settings.
 
 ## Good to know
 - **Free tier privacy:** on Gemini's free tier Google may use prompts to improve its models. Prompts contain macros, ingredients and diet choices, never names. Switch to a paid key before launching to real users.
+- **Busy AI:** the free tier often returns "high demand" or quota errors. The app quietly switches to the next model in `GEMINI_MODELS`; visitors only see "busy, try again" if every model fails. Vercel logs show which model answered each request (search `answered_by`).
 - **Abuse protection:** each visitor is limited to 15 requests per 5 minutes. On the free tier Google's own daily cap also stops runaway use, so there's no surprise bill.
 - **Data:** profiles live in each visitor's browser (localStorage). Clearing browser data or switching devices means setting up again.
