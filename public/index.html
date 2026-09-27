@@ -1,0 +1,1697 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Cook with what you have. Hit your macros.">
+<meta name="theme-color" content="#1F5F43">
+<title>Dabba Match</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400..700&display=swap">
+<style>
+:root{
+  --bg:#F4F5F0;
+  --surface:#FFFFFF;
+  --surface-2:#EEF0E9;
+  --surface-3:#E4E8DF;
+  --ink:#14201A;
+  --ink-2:#3A4740;
+  --muted:#66736B;
+  --faint:#94A098;
+  --line:#E0E4DB;
+  --line-2:#CDD3C8;
+  --brand:#1F5F43;
+  --brand-ink:#FFFFFF;
+  --brand-soft:#DCEDE3;
+  --saffron:#E99A0B;
+  --saffron-soft:#FCEBC6;
+  --protein:#DD4F38;
+  --carbs:#E99A0B;
+  --fat:#2A9785;
+  --good:#1F8A5B;
+  --warn:#B7791F;
+  --danger:#C23B2A;
+  --danger-soft:#F8E0DB;
+  --focus:#2C6BD1;
+  --shadow-sm:0 1px 2px rgba(20,32,26,.06);
+  --shadow:0 1px 2px rgba(20,32,26,.05), 0 8px 24px -12px rgba(20,32,26,.18);
+  --shadow-lg:0 24px 64px -16px rgba(20,32,26,.35);
+  --radius:16px;
+  --radius-sm:10px;
+  --font-display:'Bricolage Grotesque', 'Figtree', system-ui, sans-serif;
+  --font-body:'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1411;
+    --surface:#161E19;
+    --surface-2:#1C2620;
+    --surface-3:#243029;
+    --ink:#EAF0EC;
+    --ink-2:#C9D3CD;
+    --muted:#98A69E;
+    --faint:#6F7D75;
+    --line:#26312B;
+    --line-2:#334039;
+    --brand:#4FBF8B;
+    --brand-ink:#0B1A12;
+    --brand-soft:#1B3528;
+    --saffron:#F5B53A;
+    --saffron-soft:#3A2D10;
+    --protein:#F07A63;
+    --carbs:#F5B53A;
+    --fat:#4CC2AE;
+    --good:#4FBF8B;
+    --warn:#E5A93A;
+    --danger:#F07A63;
+    --danger-soft:#3A1E19;
+    --focus:#7BAAF5;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 10px 28px -12px rgba(0,0,0,.6);
+    --shadow-lg:0 24px 64px -16px rgba(0,0,0,.7);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1411;
+  --surface:#161E19;
+  --surface-2:#1C2620;
+  --surface-3:#243029;
+  --ink:#EAF0EC;
+  --ink-2:#C9D3CD;
+  --muted:#98A69E;
+  --faint:#6F7D75;
+  --line:#26312B;
+  --line-2:#334039;
+  --brand:#4FBF8B;
+  --brand-ink:#0B1A12;
+  --brand-soft:#1B3528;
+  --saffron:#F5B53A;
+  --saffron-soft:#3A2D10;
+  --protein:#F07A63;
+  --carbs:#F5B53A;
+  --fat:#4CC2AE;
+  --good:#4FBF8B;
+  --warn:#E5A93A;
+  --danger:#F07A63;
+  --danger-soft:#3A1E19;
+  --focus:#7BAAF5;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+  --shadow:0 1px 2px rgba(0,0,0,.35), 0 10px 28px -12px rgba(0,0,0,.6);
+  --shadow-lg:0 24px 64px -16px rgba(0,0,0,.7);
+  color-scheme: dark;
+}
+
+*{ box-sizing:border-box; }
+html,body{ background:var(--bg); }
+body{
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+button{ font:inherit; color:inherit; }
+input,select{ font:inherit; }
+h1,h2,h3,h4{ margin:0; text-wrap:balance; font-family:var(--font-display); letter-spacing:-0.01em; }
+p{ margin:0; }
+.num{ font-variant-numeric:tabular-nums; }
+.sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+:focus-visible{ outline:2px solid var(--focus); outline-offset:2px; border-radius:6px; }
+svg.i{ width:18px; height:18px; flex:none; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+/* ---------- App bar ---------- */
+.appbar{
+  position:sticky; top:env(safe-area-inset-top, 0px); z-index:20;
+  background:color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter:saturate(1.4) blur(12px);
+  -webkit-backdrop-filter:saturate(1.4) blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.appbar-inner{
+  max-width:1240px; margin:0 auto; padding-inline:16px; height:60px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.brandmark{ display:flex; align-items:center; gap:10px; }
+.brandmark svg{ width:30px; height:30px; }
+.brandmark .word{ font-family:var(--font-display); font-weight:800; font-size:19px; letter-spacing:-0.02em; }
+.brandmark .word span{ color:var(--saffron); }
+.avatar-btn{
+  display:flex; align-items:center; gap:8px; border:1px solid var(--line); background:var(--surface);
+  padding:4px 12px 4px 4px; border-radius:999px; cursor:pointer; box-shadow:var(--shadow-sm);
+}
+.avatar-btn:hover{ border-color:var(--line-2); }
+.avatar{
+  width:30px; height:30px; border-radius:50%; display:grid; place-items:center;
+  background:var(--saffron); color:#2A1A02; font-weight:700; font-size:13px; font-family:var(--font-display);
+}
+.avatar-btn .lbl{ font-size:13px; font-weight:600; color:var(--ink-2); }
+
+/* ---------- Layout ---------- */
+.wrap{ max-width:1240px; margin:0 auto; padding-inline:16px; }
+.main-grid{
+  display:grid; grid-template-columns:1fr; gap:20px; padding-block:20px 40px;
+}
+@media (min-width:980px){
+  .main-grid{ grid-template-columns:minmax(0, 440px) minmax(0, 1fr); gap:28px; align-items:start; padding-block:28px 48px; }
+  .results-pane{ position:sticky; top:84px; max-height:calc(100vh - 100px); overflow:auto; scrollbar-width:thin; }
+}
+.plan-pane{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+
+.card{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow-sm); padding:18px;
+}
+.card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+.card-title{ font-family:var(--font-display); font-weight:700; font-size:16px; }
+.eyebrow{ font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+.textlink{ background:none; border:none; padding:0; cursor:pointer; color:var(--brand); font-weight:600; font-size:13px; }
+.textlink:hover{ text-decoration:underline; }
+
+/* ---------- Greeting ---------- */
+.greet h1{ font-size:clamp(24px, 4.5vw, 30px); font-weight:800; letter-spacing:-0.025em; }
+.greet .sub{ color:var(--muted); font-size:14px; margin-top:2px; }
+.greet-row{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+/* ---------- Segmented ---------- */
+.seg{ display:inline-flex; background:var(--surface-2); border:1px solid var(--line); border-radius:999px; padding:3px; gap:2px; }
+.seg button{
+  border:none; background:transparent; padding:7px 14px; border-radius:999px; cursor:pointer;
+  font-size:13px; font-weight:600; color:var(--muted); display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+}
+.seg button svg.i{ width:15px; height:15px; }
+.seg button[aria-pressed="true"]{ background:var(--surface); color:var(--ink); box-shadow:var(--shadow-sm); }
+.seg.full{ display:flex; width:100%; }
+.seg.full button{ flex:1; justify-content:center; }
+
+/* ---------- Target card ---------- */
+.target-card{ padding:0; overflow:hidden; }
+.target-top{ padding:18px 18px 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+.big-kcal{ font-family:var(--font-display); font-weight:800; font-size:44px; line-height:1; letter-spacing:-0.03em; }
+.big-kcal small{ font-size:15px; font-weight:600; color:var(--muted); letter-spacing:0; margin-left:4px; }
+.target-caption{ color:var(--muted); font-size:13px; margin-top:6px; }
+.tiffin-stack{ display:flex; flex-direction:column; gap:4px; min-width:128px; }
+.macro-line{ display:grid; grid-template-columns:10px 1fr auto; align-items:center; gap:8px; font-size:13px; }
+.macro-line .dot{ width:10px; height:10px; border-radius:3px; }
+.macro-line .v{ font-weight:700; font-variant-numeric:tabular-nums; }
+.macro-line .k{ color:var(--muted); }
+.focus-row{ padding:12px 18px 16px; border-top:1px solid var(--line); background:var(--surface-2); }
+.focus-row .eyebrow{ margin-bottom:8px; display:block; }
+.chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.chip{
+  border:1px solid var(--line-2); background:var(--surface); color:var(--ink-2);
+  padding:7px 13px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer;
+  display:inline-flex; align-items:center; gap:6px; transition:background .15s, border-color .15s, color .15s;
+}
+.chip:hover{ border-color:var(--faint); }
+.chip[aria-pressed="true"]{ background:var(--ink); border-color:var(--ink); color:var(--bg); }
+.chip.sel-green[aria-pressed="true"]{ background:var(--brand-soft); border-color:var(--brand); color:var(--ink); }
+.chip.sel-green[aria-pressed="true"]::before{
+  content:""; width:12px; height:12px; flex:none;
+  background:var(--brand);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.daily-line{ font-size:12px; color:var(--muted); padding:0 18px 14px; }
+
+/* ---------- Kitchen ---------- */
+.search{ position:relative; }
+.search input{
+  width:100%; border:1px solid var(--line-2); background:var(--surface-2); color:var(--ink);
+  border-radius:12px; padding:11px 12px 11px 38px; font-size:15px;
+}
+.search input:focus{ outline:none; border-color:var(--brand); background:var(--surface); box-shadow:0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent); }
+.search > svg.i{ position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--faint); }
+.suggest{
+  position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:10;
+  background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow);
+  padding:6px; display:flex; flex-direction:column;
+}
+.suggest button{
+  text-align:left; background:none; border:none; padding:9px 10px; border-radius:8px; cursor:pointer; font-size:14px;
+  display:flex; align-items:center; gap:8px; color:var(--ink);
+}
+.suggest button:hover, .suggest button.active{ background:var(--surface-2); }
+.suggest .hint{ color:var(--muted); font-size:12px; margin-left:auto; }
+.selected-box{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; min-height:36px; align-items:center; }
+.pick{
+  display:inline-flex; align-items:center; gap:6px; background:var(--brand-soft); color:var(--ink);
+  border:1px solid color-mix(in srgb, var(--brand) 45%, transparent); padding:6px 8px 6px 12px; border-radius:999px;
+  font-size:13px; font-weight:600;
+}
+.pick button{ border:none; background:transparent; cursor:pointer; padding:2px; border-radius:50%; display:grid; place-items:center; color:var(--muted); }
+.pick button:hover{ color:var(--ink); background:color-mix(in srgb, var(--brand) 18%, transparent); }
+.pick button svg.i{ width:14px; height:14px; }
+.empty-note{ color:var(--faint); font-size:13px; }
+.cat-tabs{ display:flex; gap:4px; overflow-x:auto; scrollbar-width:none; margin:16px -4px 10px; padding:0 4px; }
+.cat-tabs::-webkit-scrollbar{ display:none; }
+.cat-tabs button{
+  border:none; background:none; cursor:pointer; padding:7px 12px; border-radius:999px;
+  font-size:13px; font-weight:600; color:var(--muted); white-space:nowrap;
+}
+.cat-tabs button[aria-selected="true"]{ background:var(--surface-3); color:var(--ink); }
+.cat-tabs .count{ font-size:11px; background:var(--brand); color:var(--brand-ink); border-radius:999px; padding:1px 6px; margin-left:4px; }
+
+/* ---------- Prefs ---------- */
+.pref-block + .pref-block{ margin-top:14px; }
+.pref-block .eyebrow{ display:flex; align-items:center; gap:6px; margin-bottom:8px; }
+.pref-block .eyebrow svg.i{ width:14px; height:14px; }
+
+/* ---------- CTA ---------- */
+.cta-bar{
+  position:sticky; bottom:0; z-index:6;
+  padding-block:12px calc(12px + env(safe-area-inset-bottom, 0px));
+  background:linear-gradient(to top, var(--bg) 65%, color-mix(in srgb, var(--bg) 0%, transparent));
+  margin-top:-4px;
+}
+.btn{
+  border:none; cursor:pointer; border-radius:14px; font-weight:700; font-size:15px;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 18px;
+  transition:transform .1s, background .15s, opacity .15s;
+}
+.btn:active{ transform:scale(.985); }
+.btn-primary{ background:var(--brand); color:var(--brand-ink); box-shadow:0 6px 20px -8px color-mix(in srgb, var(--brand) 70%, transparent); }
+.btn-primary:hover{ background:color-mix(in srgb, var(--brand) 88%, var(--ink)); }
+.btn-primary:disabled{ opacity:.45; cursor:not-allowed; box-shadow:none; }
+.btn-ghost{ background:var(--surface); border:1px solid var(--line-2); color:var(--ink); }
+.btn-ghost:hover{ border-color:var(--faint); }
+.btn-block{ width:100%; }
+.cta-main{ width:100%; justify-content:space-between; padding:15px 18px; font-size:16px; }
+.cta-main .meta{ font-weight:600; font-size:13px; opacity:.85; }
+.cta-hint{ text-align:center; font-size:12px; color:var(--muted); margin-top:8px; }
+
+/* ---------- Results ---------- */
+.results-pane{ min-width:0; }
+.results-inner{ display:flex; flex-direction:column; gap:16px; }
+.res-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap; }
+.res-head h2{ font-size:22px; font-weight:800; }
+.res-tags{ display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+.tag{ font-size:12px; font-weight:600; padding:4px 9px; border-radius:999px; background:var(--surface-3); color:var(--ink-2); display:inline-flex; align-items:center; gap:5px; }
+.tag svg.i{ width:13px; height:13px; }
+.status-line{ display:flex; align-items:center; gap:10px; font-size:14px; color:var(--muted); }
+.spinner{ width:16px; height:16px; border-radius:50%; border:2px solid var(--line-2); border-top-color:var(--brand); animation:spin .8s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+.dish{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.dish.enter{ animation:rise .35s ease both; }
+@keyframes rise{ from{ opacity:.001; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+.dish-top{ padding:18px 18px 12px; display:flex; gap:14px; align-items:flex-start; justify-content:space-between; }
+.dish-top h3{ font-size:20px; font-weight:750; line-height:1.15; }
+.dish-top .tagline{ color:var(--muted); font-size:14px; margin-top:4px; }
+.match{
+  flex:none; text-align:center; border-radius:12px; padding:8px 10px; min-width:74px;
+  background:var(--brand-soft);
+}
+.match .pct{ font-family:var(--font-display); font-weight:800; font-size:20px; line-height:1; color:var(--good); }
+.match .lab{ font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-top:3px; }
+.match.mid{ background:var(--saffron-soft); } .match.mid .pct{ color:var(--warn); }
+.match.low{ background:var(--surface-3); } .match.low .pct{ color:var(--muted); }
+.dish-meta{ display:flex; gap:8px; flex-wrap:wrap; padding:0 18px 14px; }
+.bars{ padding:0 18px 16px; display:grid; gap:9px; }
+.bar-row{ display:grid; grid-template-columns:62px 1fr 76px; gap:10px; align-items:center; font-size:12px; }
+.bar-row .k{ color:var(--muted); font-weight:600; }
+.bar-row .v{ text-align:right; font-variant-numeric:tabular-nums; color:var(--ink-2); }
+.bar-row .v b{ color:var(--ink); }
+.track{ position:relative; height:8px; background:var(--surface-3); border-radius:999px; overflow:visible; }
+.track .fill{ position:absolute; left:0; top:0; bottom:0; border-radius:999px; transition:width .5s ease; }
+.track .goal{ position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--ink); border-radius:2px; opacity:.55; }
+.dish-ings{ padding:14px 18px; border-top:1px solid var(--line); display:grid; gap:10px; }
+.ing-group .eyebrow{ margin-bottom:6px; display:block; }
+.ing-list{ display:flex; flex-wrap:wrap; gap:6px; }
+.ing{ font-size:12px; padding:4px 9px; border-radius:8px; background:var(--brand-soft); color:var(--ink); }
+.ing.need{ background:var(--danger-soft); }
+.dish-actions{ display:flex; gap:8px; padding:12px 18px 16px; border-top:1px solid var(--line); flex-wrap:wrap; }
+.dish-actions .btn{ padding:10px 14px; font-size:14px; border-radius:12px; }
+.btn-cooked[aria-pressed="true"]{ background:var(--brand); color:var(--brand-ink); border-color:var(--brand); }
+.recipe{ padding:4px 18px 18px; display:none; }
+.recipe.open{ display:block; animation:rise .25s ease both; }
+.recipe ol{ list-style:none; margin:0; padding:0; counter-reset:step; display:grid; gap:10px; }
+.recipe li{ counter-increment:step; display:grid; grid-template-columns:28px 1fr; gap:10px; font-size:14.5px; line-height:1.5; color:var(--ink-2); }
+.recipe li::before{
+  content:counter(step); width:26px; height:26px; border-radius:50%; background:var(--surface-3); color:var(--ink);
+  font-weight:700; font-size:12px; display:grid; place-items:center; font-family:var(--font-display);
+}
+.example-badge{ font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--saffron); background:var(--saffron-soft); padding:3px 8px; border-radius:6px; display:inline-block; margin-bottom:8px; }
+
+.skel{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px; display:grid; gap:12px; }
+.sk{ height:12px; border-radius:6px; background:linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%); background-size:200% 100%; animation:shimmer 1.2s ease-in-out infinite; }
+@keyframes shimmer{ from{ background-position:100% 0; } to{ background-position:-100% 0; } }
+
+.idle{ text-align:left; }
+.idle-hero{ display:flex; gap:16px; align-items:center; padding:20px; background:var(--surface); border:1px dashed var(--line-2); border-radius:var(--radius); }
+.idle-hero svg{ width:56px; height:56px; flex:none; }
+.idle-hero h2{ font-size:20px; font-weight:800; }
+.idle-hero p{ color:var(--muted); font-size:14px; margin-top:4px; }
+.err{ background:var(--danger-soft); border-radius:var(--radius); padding:16px 18px; display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+.err p{ font-size:14px; color:var(--ink); }
+
+.recent-card .chips{ gap:6px; }
+.recent{ display:inline-flex; align-items:center; gap:6px; background:var(--surface-2); border:1px solid var(--line); border-radius:999px; padding:5px 6px 5px 12px; font-size:13px; }
+.recent .when{ color:var(--faint); font-size:11px; }
+.recent button{ border:none; background:none; cursor:pointer; color:var(--faint); padding:2px; display:grid; place-items:center; border-radius:50%; }
+.recent button:hover{ color:var(--ink); background:var(--surface-3); }
+.recent button svg.i{ width:13px; height:13px; }
+
+/* ---------- Onboarding ---------- */
+.ob{ max-width:580px; margin:0 auto; padding-inline:16px; padding-block:24px 48px; display:flex; flex-direction:column; }
+.ob-top{ display:flex; align-items:center; gap:12px; margin-bottom:26px; }
+.ob-back{ border:1px solid var(--line); background:var(--surface); width:38px; height:38px; border-radius:50%; display:grid; place-items:center; cursor:pointer; flex:none; }
+.ob-back[disabled]{ visibility:hidden; }
+.ob-progress{ display:flex; gap:6px; flex:1; }
+.ob-progress span{ height:5px; border-radius:999px; background:var(--surface-3); flex:1; transition:background .3s; }
+.ob-progress span.done{ background:var(--brand); }
+.ob-step{ animation:rise .3s ease both; }
+.ob-step h1{ font-size:clamp(26px, 5vw, 34px); font-weight:800; letter-spacing:-0.03em; line-height:1.1; }
+.ob-step .lede{ color:var(--muted); font-size:15.5px; margin-top:8px; max-width:48ch; }
+.ob-body{ margin-top:24px; display:grid; gap:18px; }
+.ob-foot{ margin-top:28px; display:grid; gap:10px; }
+.field{ display:grid; gap:6px; }
+.field > label, .field > .lab{ font-size:13px; font-weight:700; color:var(--ink-2); }
+.field .help{ font-size:12px; color:var(--muted); }
+.input{
+  width:100%; border:1px solid var(--line-2); background:var(--surface); color:var(--ink);
+  border-radius:12px; padding:12px 14px; font-size:16px;
+}
+.input:focus{ outline:none; border-color:var(--brand); box-shadow:0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent); }
+.input-unit{ position:relative; }
+.input-unit .input{ padding-right:48px; }
+.input-unit .u{ position:absolute; right:14px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:14px; font-weight:600; pointer-events:none; }
+.row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.row-lab{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.options{ display:grid; gap:10px; }
+.options.two{ grid-template-columns:1fr 1fr; }
+.opt{
+  text-align:left; border:1.5px solid var(--line); background:var(--surface); border-radius:14px; padding:14px 16px; cursor:pointer;
+  display:flex; align-items:flex-start; gap:12px; transition:border-color .15s, background .15s; position:relative;
+}
+.opt:hover{ border-color:var(--line-2); }
+.opt[aria-pressed="true"]{ border-color:var(--brand); background:color-mix(in srgb, var(--brand-soft) 55%, var(--surface)); }
+.opt .t{ font-weight:700; font-size:15px; }
+.opt .d{ color:var(--muted); font-size:13px; margin-top:2px; }
+.opt .radio{ width:20px; height:20px; border-radius:50%; border:2px solid var(--line-2); flex:none; margin-top:1px; display:grid; place-items:center; }
+.opt[aria-pressed="true"] .radio{ border-color:var(--brand); background:var(--brand); }
+.opt[aria-pressed="true"] .radio::after{ content:""; width:7px; height:7px; border-radius:50%; background:var(--brand-ink); }
+.opt .badge{ position:absolute; top:-9px; right:12px; font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; background:var(--saffron); color:#2A1A02; padding:2px 8px; border-radius:6px; }
+.stepper{ display:inline-flex; align-items:center; border:1px solid var(--line-2); border-radius:12px; overflow:hidden; background:var(--surface); }
+.stepper button{ border:none; background:none; width:42px; height:42px; cursor:pointer; font-size:18px; font-weight:600; color:var(--ink); }
+.stepper button:hover{ background:var(--surface-2); }
+.stepper .val{ min-width:44px; text-align:center; font-weight:700; font-variant-numeric:tabular-nums; font-size:16px; }
+.welcome-mark{ width:72px; height:72px; margin-bottom:20px; }
+.ob-note{ font-size:12.5px; color:var(--muted); background:var(--surface-2); border-radius:12px; padding:12px 14px; }
+.ob-warn{ font-size:13px; color:var(--ink); background:var(--saffron-soft); border-radius:12px; padding:12px 14px; }
+
+/* Result */
+.result-hero{ background:var(--ink); color:var(--bg); border-radius:20px; padding:22px; position:relative; overflow:hidden; }
+.result-hero .eyebrow{ color:color-mix(in srgb, var(--bg) 65%, transparent); }
+.result-hero .kc{ font-family:var(--font-display); font-weight:800; font-size:56px; line-height:1; letter-spacing:-0.04em; margin-top:6px; }
+.result-hero .kc small{ font-size:16px; font-weight:600; letter-spacing:0; opacity:.7; margin-left:6px; }
+.result-hero .split{ display:flex; height:10px; border-radius:999px; overflow:hidden; margin-top:18px; gap:2px; }
+.result-hero .split span{ display:block; }
+.result-legend{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:14px; }
+.result-legend div{ font-size:12px; color:color-mix(in srgb, var(--bg) 70%, transparent); }
+.result-legend b{ display:block; font-family:var(--font-display); font-size:22px; color:var(--bg); font-weight:750; }
+.daycards{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.daycard{ border:1px solid var(--line); background:var(--surface); border-radius:14px; padding:14px; }
+.daycard .h{ display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+.daycard .k{ font-family:var(--font-display); font-weight:800; font-size:26px; margin-top:6px; }
+.daycard .m{ font-size:12.5px; color:var(--muted); margin-top:2px; font-variant-numeric:tabular-nums; }
+details.how{ border:1px solid var(--line); border-radius:14px; background:var(--surface); }
+details.how summary{ cursor:pointer; padding:14px 16px; font-weight:700; font-size:14px; list-style:none; display:flex; justify-content:space-between; align-items:center; }
+details.how summary::-webkit-details-marker{ display:none; }
+details.how summary svg.i{ transition:transform .2s; }
+details.how[open] summary svg.i{ transform:rotate(180deg); }
+.how-body{ padding:0 16px 16px; display:grid; gap:8px; font-size:13.5px; }
+.how-row{ display:flex; justify-content:space-between; gap:12px; border-bottom:1px dashed var(--line); padding-bottom:8px; }
+.how-row:last-child{ border-bottom:none; }
+.how-row span:first-child{ color:var(--muted); }
+.how-row span:last-child{ font-weight:600; font-variant-numeric:tabular-nums; text-align:right; }
+
+/* ---------- Drawer ---------- */
+.scrim{ position:fixed; inset:0; background:rgba(8,14,11,.45); z-index:40; opacity:0; pointer-events:none; transition:opacity .25s; }
+.scrim.open{ opacity:1; pointer-events:auto; }
+.drawer{
+  position:fixed; z-index:41; background:var(--bg); box-shadow:var(--shadow-lg);
+  display:flex; flex-direction:column;
+  top:0; right:0; bottom:0; width:min(460px, 100%);
+  transform:translateX(104%); transition:transform .3s cubic-bezier(.2,.8,.2,1);
+  padding-top:env(safe-area-inset-top, 0px);
+}
+.drawer.open{ transform:none; }
+.drawer-head{ display:flex; align-items:center; gap:12px; padding:16px; border-bottom:1px solid var(--line); background:var(--surface); }
+.drawer-head .avatar{ width:44px; height:44px; font-size:18px; }
+.drawer-head .who{ flex:1; min-width:0; }
+.drawer-head .who input{ border:none; background:transparent; font-family:var(--font-display); font-weight:800; font-size:20px; color:var(--ink); padding:2px 4px; margin-left:-4px; border-radius:6px; width:100%; }
+.drawer-head .who input:hover{ background:var(--surface-2); }
+.drawer-head .who input:focus{ outline:none; background:var(--surface-2); }
+.drawer-head .who .sub{ font-size:12.5px; color:var(--muted); }
+.icon-btn{ border:1px solid var(--line); background:var(--surface); width:38px; height:38px; border-radius:50%; display:grid; place-items:center; cursor:pointer; flex:none; }
+.icon-btn:hover{ border-color:var(--line-2); }
+.drawer-body{ flex:1; overflow:auto; padding:16px 16px calc(24px + env(safe-area-inset-bottom, 0px)); display:flex; flex-direction:column; gap:14px; }
+.pf-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px; display:grid; gap:14px; }
+.pf-card > h3{ font-size:15px; font-weight:750; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.pf-row .input-unit{ width:100%; max-width:150px; }
+.pf-row .input-unit .input{ max-width:none; }
+.pf-row .row2 .input-unit{ max-width:none; }
+.pf-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.pf-row > .lab{ font-size:13.5px; font-weight:600; color:var(--ink-2); }
+.pf-row .input{ max-width:150px; padding:9px 12px; font-size:15px; }
+.pf-row select.input{ max-width:210px; }
+.tgt-grid{ display:grid; grid-template-columns:auto repeat(4, minmax(0, 1fr)); gap:6px 8px; font-size:13px; align-items:center; }
+.tgt-grid .h{ font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.05em; text-align:right; }
+.tgt-grid .d{ font-weight:700; display:flex; align-items:center; gap:6px; }
+.tgt-grid .d svg.i{ width:15px; height:15px; color:var(--muted); }
+.tgt-grid .c{ text-align:right; font-variant-numeric:tabular-nums; font-weight:600; }
+.tgt-grid input{ width:100%; min-width:0; text-align:center; font-size:14px; border:1px solid var(--line-2); border-radius:8px; padding:8px 2px; -moz-appearance:textfield; background:var(--surface-2); color:var(--ink); font-variant-numeric:tabular-nums; }
+.tgt-grid input:focus{ outline:none; border-color:var(--brand); background:var(--surface); }
+.delta{ font-size:11px; font-weight:700; padding:2px 6px; border-radius:6px; }
+.delta.up{ color:var(--good); background:var(--brand-soft); }
+.delta.down{ color:var(--danger); background:var(--danger-soft); }
+.nudge{ background:var(--saffron-soft); border-radius:12px; padding:12px 14px; font-size:13px; display:flex; gap:10px; align-items:flex-start; }
+.weight-now{ display:flex; align-items:baseline; gap:8px; }
+.weight-now b{ font-family:var(--font-display); font-weight:800; font-size:30px; letter-spacing:-0.02em; }
+.weight-now span{ color:var(--muted); font-size:13px; }
+.log-row{ display:flex; gap:8px; }
+.log-row .input-unit{ flex:1; }
+.log-row .input{ padding:10px 44px 10px 12px; font-size:15px; }
+.spark{ width:100%; height:72px; display:block; }
+.hist{ display:grid; gap:4px; font-size:13px; }
+.hist div{ display:flex; justify-content:space-between; color:var(--ink-2); font-variant-numeric:tabular-nums; }
+.hist div span:first-child{ color:var(--muted); }
+.danger-btn{ border:1px solid var(--danger); color:var(--danger); background:transparent; }
+.danger-btn.armed{ background:var(--danger); color:#fff; }
+
+/* ---------- Toast ---------- */
+.toast{
+  position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom, 0px)); transform:translate(-50%, 20px);
+  background:var(--ink); color:var(--bg); padding:11px 16px; border-radius:12px; font-size:14px; font-weight:600;
+  box-shadow:var(--shadow-lg); z-index:60; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
+  max-width:calc(100% - 32px); display:flex; gap:8px; align-items:center;
+}
+.toast.show{ opacity:1; transform:translate(-50%, 0); }
+
+[hidden]{ display:none !important; }
+
+.tgt-grid input::-webkit-outer-spin-button, .tgt-grid input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+@media (max-width:420px){
+  .tgt-grid .d svg.i{ display:none; }
+  .tgt-grid .d{ font-size:12.5px; }
+  .target-top{ flex-direction:column; }
+  .tiffin-stack{ width:100%; }
+  .options.two{ grid-template-columns:1fr; }
+  .bar-row{ grid-template-columns:54px 1fr 70px; }
+  .big-kcal{ font-size:40px; }
+}
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 3c1 3.2 5 5.2 5 10a5 5 0 0 1-10 0c0-2.2 1-3.4 2-4.2 0 1.8.9 3 2 3.2-.3-3 .4-6 1-9z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-dumbbell" viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"/></symbol>
+    <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1.8 2 5.2 2 7 0M9 9.5h.01M15 9.5h.01"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4z"/><path d="M5 16a4 4 0 0 1 4-4h10"/></symbol>
+    <symbol id="i-scale" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 11a4.5 4.5 0 0 1 8 0"/><path d="M12 11l1.6-2.2"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  </defs>
+</svg>
+
+<!-- The three-tier dabba mark: one tier per macro (protein, carbs, fat). -->
+<template id="tpl-mark">
+  <svg viewBox="0 0 40 40" aria-hidden="true">
+    <path d="M13 9.5c0-4.5 14-4.5 14 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+    <rect x="7" y="9.5" width="26" height="8" rx="3" fill="var(--protein)"/>
+    <rect x="7" y="19" width="26" height="8" rx="3" fill="var(--carbs)"/>
+    <rect x="7" y="28.5" width="26" height="8" rx="3" fill="var(--fat)"/>
+    <rect x="18" y="12" width="4" height="3" rx="1" fill="rgba(255,255,255,.55)"/>
+  </svg>
+</template>
+
+<header class="appbar">
+  <div class="appbar-inner">
+    <div class="brandmark">
+      <span class="mark-slot" style="color:var(--ink)"></span>
+      <span class="word">Dabba<span>Match</span></span>
+    </div>
+    <button type="button" class="avatar-btn" id="avatarBtn" aria-label="Open profile and settings" hidden>
+      <span class="avatar" id="avatarInitial">?</span>
+      <span class="lbl">Profile</span>
+    </button>
+  </div>
+</header>
+
+<section id="obView" hidden></section>
+
+<main id="mainView" class="wrap" hidden>
+  <div class="main-grid">
+    <!-- ================= PLAN PANE ================= -->
+    <div class="plan-pane">
+      <div class="greet">
+        <div class="greet-row">
+          <div>
+            <h1 id="greetTitle">Good evening</h1>
+            <p class="sub" id="greetSub"></p>
+          </div>
+          <div class="seg" role="group" aria-label="Day type">
+            <button type="button" data-day="training" aria-pressed="true"><svg class="i"><use href="#i-dumbbell"/></svg>Training</button>
+            <button type="button" data-day="rest" aria-pressed="false"><svg class="i"><use href="#i-moon"/></svg>Rest</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card target-card">
+        <div class="target-top">
+          <div>
+            <span class="eyebrow">This meal</span>
+            <div class="big-kcal num" id="mealKcal">0<small>kcal</small></div>
+            <p class="target-caption" id="mealCaption"></p>
+          </div>
+          <div class="tiffin-stack" id="mealMacros"></div>
+        </div>
+        <div class="daily-line num" id="dailyLine"></div>
+        <div class="focus-row">
+          <span class="eyebrow">Macro focus</span>
+          <div class="chips" id="focusChips" role="group" aria-label="Macro focus">
+            <button type="button" class="chip" data-focus="balanced">Balanced</button>
+            <button type="button" class="chip" data-focus="protein">High protein</button>
+            <button type="button" class="chip" data-focus="carb">High carb</button>
+            <button type="button" class="chip" data-focus="light">Light bite</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">In your kitchen</div>
+            <div class="eyebrow" id="kitchenCount" style="margin-top:2px">0 items</div>
+          </div>
+          <button type="button" class="textlink" id="clearKitchen" hidden>Clear all</button>
+        </div>
+        <div class="search">
+          <svg class="i"><use href="#i-search"/></svg>
+          <input id="kitchenSearch" type="text" autocomplete="off" placeholder="Search or add an ingredient" aria-label="Search or add an ingredient" aria-controls="suggestBox">
+          <div class="suggest" id="suggestBox" role="listbox" hidden></div>
+        </div>
+        <div class="selected-box" id="selectedBox"></div>
+        <div class="cat-tabs" role="tablist" id="catTabs"></div>
+        <div class="chips" id="stapleChips"></div>
+      </div>
+
+      <div class="card">
+        <div class="pref-block">
+          <span class="eyebrow"><svg class="i"><use href="#i-clock"/></svg>Cooking time</span>
+          <div class="chips" id="timeChips" role="group" aria-label="Cooking time">
+            <button type="button" class="chip" data-time="any">Any</button>
+            <button type="button" class="chip" data-time="15">15 min</button>
+            <button type="button" class="chip" data-time="30">30 min</button>
+            <button type="button" class="chip" data-time="45">45 min</button>
+          </div>
+        </div>
+        <div class="pref-block">
+          <span class="eyebrow"><svg class="i"><use href="#i-smile"/></svg>In the mood for</span>
+          <div class="chips" id="moodChips" role="group" aria-label="Mood">
+            <button type="button" class="chip" data-mood="any">Anything</button>
+            <button type="button" class="chip" data-mood="spicy">Spicy</button>
+            <button type="button" class="chip" data-mood="comfort">Comfort food</button>
+            <button type="button" class="chip" data-mood="street">Street-style</button>
+            <button type="button" class="chip" data-mood="fresh">Fresh &amp; light</button>
+            <button type="button" class="chip" data-mood="sweet">Something sweet</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-bar">
+        <button type="button" class="btn btn-primary cta-main" id="findBtn">
+          <span style="display:inline-flex;align-items:center;gap:8px">Find 3 dishes <svg class="i"><use href="#i-arrow"/></svg></span>
+          <span class="meta num" id="findMeta"></span>
+        </button>
+        <p class="cta-hint" id="findHint" hidden>Add at least one ingredient to get ideas.</p>
+      </div>
+    </div>
+
+    <!-- ================= RESULTS PANE ================= -->
+    <div class="results-pane" id="resultsPane">
+      <div class="results-inner">
+        <div id="resultsBody"></div>
+        <div class="card recent-card">
+          <div class="card-head" style="margin-bottom:10px">
+            <div class="card-title">Recently cooked</div>
+            <span class="eyebrow">We skip these next time</span>
+          </div>
+          <div class="chips" id="recentList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="pfName" aria-hidden="true"></aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* =====================================================================
+   Macro engine
+   Mifflin-St Jeor BMR x activity factor, goal-rate adjustment (7,700 kcal/kg),
+   protein by g/kg of a reference weight (capped at BMI 27.5), fat 27% kcal
+   with a 0.6 g/kg floor, carbs as remainder; training days sit ~12% above
+   rest days while the weekly average stays on target.
+   ===================================================================== */
+var ACTIVITY = {
+  sedentary:{ f:1.2,   t:"Mostly sitting", d:"Desk job, little walking" },
+  light:    { f:1.375, t:"Lightly active", d:"Some walking, light exercise 1-3 days" },
+  moderate: { f:1.55,  t:"Moderately active", d:"Exercise 3-5 days a week" },
+  very:     { f:1.725, t:"Very active", d:"Hard training 6-7 days a week" },
+  extra:    { f:1.9,   t:"Athlete / physical job", d:"Twice-a-day training or manual work" }
+};
+var GOALS = {
+  lose:    { t:"Lose fat", d:"Drop fat while keeping muscle" },
+  recomp:  { t:"Recomposition", d:"Build muscle, slowly lose fat" },
+  maintain:{ t:"Maintain", d:"Stay where you are, eat well" },
+  gain:    { t:"Build muscle", d:"Lean bulk with a small surplus" }
+};
+var PACES = {
+  lose: { gentle:{t:"Gentle", r:0.005}, standard:{t:"Steady", r:0.0075}, fast:{t:"Faster", r:0.01} },
+  gain: { gentle:{t:"Gentle", r:0.0025}, standard:{t:"Steady", r:0.0035}, fast:{t:"Faster", r:0.005} }
+};
+var PROTEIN_PER_KG = { lose:2.2, recomp:2.0, maintain:1.8, gain:2.0 };
+
+function calcTargets(p){
+  var w = +p.weightKg, h = +p.heightCm, a = +p.age;
+  var hm = h/100, bmi = w/(hm*hm);
+  var bmr = 10*w + 6.25*h - 5*a + (p.sex === "female" ? -161 : 5);
+  var tdee = bmr * (ACTIVITY[p.activity] ? ACTIVITY[p.activity].f : 1.55);
+  var adj = 0, rate = 0;
+  if(p.goal === "lose"){
+    rate = PACES.lose[p.pace || "standard"].r;
+    adj = Math.max(-(w*rate*7700/7), -0.25*tdee);
+  } else if(p.goal === "gain"){
+    rate = PACES.gain[p.pace || "standard"].r;
+    adj = Math.min(w*rate*7700/7, 0.15*tdee);
+  } else if(p.goal === "recomp"){
+    adj = -0.05*tdee;
+  }
+  var avg = tdee + adj;
+  var floor = p.sex === "female" ? 1200 : 1500, floored = false;
+  if(avg < floor){ avg = floor; floored = true; }
+  var refWeight = Math.min(w, 27.5*hm*hm);
+  var ppk = PROTEIN_PER_KG[p.goal] || 1.8;
+  var protein = ppk*refWeight;
+  var fat = Math.max(avg*0.27/9, 0.6*refWeight);
+  var carbs = (avg - protein*4 - fat*9)/4;
+  if(carbs < 50){
+    var minFat = 0.5*refWeight, need = (50-carbs)*4, canTrim = Math.max(0, (fat-minFat)*9);
+    fat -= Math.min(need, canTrim)/9;
+    carbs = Math.max(0, (avg - protein*4 - fat*9)/4);
+  }
+  var n = Math.max(0, Math.min(7, Math.round(p.workoutDays || 0)));
+  var base = { kcal:avg, protein:protein, carbs:carbs, fat:fat }, training, rest;
+  if(n >= 1 && n <= 6){
+    var gap = 0.12*avg, bump = gap*(7-n)/7, drop = gap*n/7;
+    var maxDrop = Math.max(0, (carbs-40)*4);
+    if(drop > maxDrop){ drop = maxDrop; bump = drop*(7-n)/n; }
+    training = { protein:protein, carbs:carbs + bump/4, fat:fat };
+    rest = { protein:protein, carbs:carbs - drop/4, fat:fat };
+  } else { training = base; rest = base; }
+  function r(o){ var P=Math.round(o.protein), C=Math.round(o.carbs), F=Math.round(o.fat); return { kcal:P*4+C*4+F*9, protein:P, carbs:C, fat:F }; }
+  return { weight:w, bmi:bmi, bmr:bmr, tdee:tdee, adj:adj, rate:rate, avg:avg, floored:floored, proteinPerKg:ppk,
+           refWeight:refWeight, workoutDays:n, training:r(training), rest:r(rest), average:r(base) };
+}
+
+/* ===================== Units ===================== */
+var LB = 2.20462;
+function kgTo(u, kg){ return u === "lb" ? kg*LB : kg; }
+function toKg(u, v){ return u === "lb" ? v/LB : v; }
+function cmToFtIn(cm){ var t = cm/2.54, ft = Math.floor(t/12), inch = Math.round(t - ft*12); if(inch === 12){ ft++; inch = 0; } return { ft:ft, inch:inch }; }
+function ftInToCm(ft, inch){ return (ft*12 + inch)*2.54; }
+function fmtWeight(kg, u){ return (Math.round(kgTo(u, kg)*10)/10).toFixed(1).replace(/\.0$/, "") + " " + u; }
+function fmtHeight(cm, u){ if(u === "ftin"){ var f = cmToFtIn(cm); return f.ft + "′" + f.inch + "″"; } return Math.round(cm) + " cm"; }
+function fmt(n){ return Math.round(n).toLocaleString("en-US"); }
+
+/* ===================== Staples ===================== */
+var CATS = [
+  { id:"protein", t:"Protein" },
+  { id:"carbs", t:"Carbs" },
+  { id:"fats", t:"Dairy & fats" },
+  { id:"veg", t:"Veg & fruit" },
+  { id:"pantry", t:"Pantry" }
+];
+var STAPLES = {
+  protein:[["Eggs","egg"],["Chicken breast","meat"],["Chicken thighs","meat"],["Mutton","redmeat"],["Fish","fish"],["Prawns","fish"],["Paneer","dairy"],["Greek yogurt","dairy"],["Curd (dahi)","dairy"],["Whey protein","dairy"],["Tofu",""],["Soy chunks",""],["Moong dal",""],["Toor dal",""],["Masoor dal",""],["Chana",""],["Rajma",""],["Peanuts","nut"]],
+  carbs:[["Rice",""],["Roti / atta","gluten"],["Oats",""],["Bread","gluten"],["Poha",""],["Suji / rava","gluten"],["Besan",""],["Potato",""],["Sweet potato",""],["Pasta","gluten"],["Wraps / tortilla","gluten"],["Quinoa",""]],
+  fats:[["Milk","dairy"],["Butter / ghee","dairy"],["Cheese","dairy"],["Cream cheese","dairy"],["Almonds","nut"],["Peanut butter","nut"],["Olive oil",""],["Coconut",""]],
+  veg:[["Onion",""],["Tomato",""],["Spinach",""],["Capsicum",""],["Mixed veggies",""],["Peas",""],["Carrot",""],["Cucumber",""],["Mushroom",""],["Cauliflower",""],["Banana",""],["Apple",""],["Berries",""]],
+  pantry:[["Garlic",""],["Ginger",""],["Green chilli",""],["Lemon",""],["Basic masala",""],["Coriander",""],["Honey",""],["Soy sauce","gluten"],["Chilli flakes",""]]
+};
+var DIETS = {
+  nonveg:{ t:"Non-veg", d:"Eat everything", hide:[] },
+  egg:{ t:"Eggetarian", d:"Vegetarian plus eggs", hide:["meat","redmeat","fish"] },
+  veg:{ t:"Vegetarian", d:"No meat, fish or eggs", hide:["meat","redmeat","fish","egg"] },
+  vegan:{ t:"Vegan", d:"Fully plant-based", hide:["meat","redmeat","fish","egg","dairy"] }
+};
+var AVOIDS = [["Beef",""],["Pork",""],["Red meat","redmeat"],["Seafood","fish"],["Eggs","egg"],["Dairy","dairy"],["Gluten","gluten"],["Nuts","nut"]];
+var FOCUS_LABEL = { balanced:"Balanced", protein:"High protein", carb:"High carb", light:"Light bite" };
+var MOOD_LABEL = { any:"", spicy:"Spicy", comfort:"Comfort food", street:"Street-style", fresh:"Fresh & light", sweet:"Something sweet" };
+
+function hiddenTags(){
+  var tags = (DIETS[state.diet] || DIETS.nonveg).hide.slice();
+  (state.avoid || []).forEach(function(a){ AVOIDS.forEach(function(x){ if(x[0] === a && x[1]) tags.push(x[1]); }); });
+  return tags;
+}
+function visibleStaples(cat){
+  var hide = hiddenTags();
+  return STAPLES[cat].filter(function(s){ return !s[1] || hide.indexOf(s[1]) === -1; }).map(function(s){ return s[0]; });
+}
+function allVisibleStaples(){ var out = []; CATS.forEach(function(c){ out = out.concat(visibleStaples(c.id)); }); return out; }
+
+/* ===================== State ===================== */
+var KEY = "dabbamatch_v4";
+var OLD_KEY = "dabbamatch_profile_v3";
+function freshState(){
+  return {
+    v:4, onboarded:false, name:"",
+    units:{ weight:"kg", height:"cm" },
+    body:{ sex:"", age:null, heightCm:null, weightKg:null },
+    weightLog:[],
+    activity:"moderate", workoutDays:4,
+    goal:"maintain", pace:"standard",
+    targetMode:"auto",
+    custom:{ training:{kcal:2200,protein:150,carbs:230,fat:70}, rest:{kcal:1950,protein:150,carbs:170,fat:70} },
+    diet:"nonveg", avoid:[], cuisine:"indian",
+    mealsPerDay:4,
+    dayType:"training", focus:"balanced", time:"any", mood:"any",
+    kitchen:[], recentlyMade:[]
+  };
+}
+var state = freshState();
+
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+function load(){
+  var s = null;
+  try{ var raw = localStorage.getItem(KEY); if(raw) s = JSON.parse(raw); }catch(e){}
+  if(s && typeof s === "object"){ state = Object.assign(freshState(), s); return; }
+  // migrate v3 (manual macros) so existing users keep their targets, kitchen and history
+  var old = null;
+  try{ var r3 = localStorage.getItem(OLD_KEY); if(r3) old = JSON.parse(r3); }catch(e){}
+  if(old && typeof old === "object"){
+    var st = freshState();
+    st.onboarded = true;
+    st.name = old.name || "";
+    st.goal = ({ "Lean bulk":"gain", "Fat loss":"lose", "Recomposition":"recomp", "Maintenance":"maintain" })[old.goal] || "maintain";
+    st.mealsPerDay = old.mealsPerDay || 4;
+    st.targetMode = "custom";
+    if(old.training) st.custom.training = sanitizeMacro(old.training);
+    if(old.rest) st.custom.rest = sanitizeMacro(old.rest);
+    st.kitchen = Array.isArray(old.kitchen) ? old.kitchen.slice(0, 60) : [];
+    st.recentlyMade = Array.isArray(old.recentlyMade) ? old.recentlyMade.slice(0, 10) : [];
+    st.dayType = old.dayType === "rest" ? "rest" : "training";
+    state = st; save();
+  }
+}
+function sanitizeMacro(m){ return { kcal:+m.kcal||0, protein:+m.protein||0, carbs:+m.carbs||0, fat:+m.fat||0 }; }
+function hasBody(b){ b = b || state.body; return !!(b && (b.sex === "male" || b.sex === "female") && b.age >= 14 && b.heightCm >= 120 && b.weightKg >= 30); }
+function calcFor(s){
+  return calcTargets({ sex:s.body.sex, age:s.body.age, heightCm:s.body.heightCm, weightKg:s.body.weightKg,
+    activity:s.activity, workoutDays:s.workoutDays, goal:s.goal, pace:s.pace });
+}
+function dailyTargets(){
+  if(state.targetMode === "auto" && hasBody()){ var c = calcFor(state); return { training:c.training, rest:c.rest, calc:c }; }
+  return { training:state.custom.training, rest:state.custom.rest, calc:null };
+}
+function mealTarget(){
+  var d = dailyTargets()[state.dayType === "rest" ? "rest" : "training"];
+  var m = Math.max(1, state.mealsPerDay);
+  var t = { protein:d.protein/m, carbs:d.carbs/m, fat:d.fat/m };
+  if(state.focus === "protein"){ t.protein *= 1.3; t.carbs *= 0.8; t.fat *= 0.85; }
+  else if(state.focus === "carb"){ t.carbs *= 1.3; t.protein *= 0.9; t.fat *= 0.85; }
+  else if(state.focus === "light"){ t.protein *= 0.75; t.carbs *= 0.55; t.fat *= 0.55; }
+  t.kcal = t.protein*4 + t.carbs*4 + t.fat*9;
+  return t;
+}
+
+/* ===================== Helpers ===================== */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function icon(id, cls){ return '<svg class="i' + (cls ? " " + cls : "") + '"><use href="#i-' + id + '"/></svg>'; }
+function markSVG(){ return $("tpl-mark").innerHTML; }
+function todayISO(){ var d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+function fmtDate(iso){ var p = iso.split("-"); var d = new Date(+p[0], +p[1]-1, +p[2]); return d.toLocaleDateString("en-US", { month:"short", day:"numeric" }); }
+function relTime(ts){
+  var diff = Date.now() - ts, day = 86400000;
+  if(diff < day && new Date(ts).getDate() === new Date().getDate()) return "today";
+  var d = Math.max(1, Math.round(diff/day));
+  return d === 1 ? "yesterday" : d + "d ago";
+}
+var toastTimer = null;
+function toast(msg){
+  var t = $("toast"); t.innerHTML = icon("check") + "<span>" + esc(msg) + "</span>";
+  t.classList.add("show"); clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2400);
+}
+function setPressed(container, attr, val){
+  Array.prototype.forEach.call(container.querySelectorAll("[" + attr + "]"), function(b){
+    b.setAttribute("aria-pressed", b.getAttribute(attr) === String(val) ? "true" : "false");
+  });
+}
+document.querySelectorAll(".mark-slot").forEach(function(el){ el.innerHTML = markSVG(); el.querySelector("svg").style.cssText = "width:30px;height:30px;display:block"; });
+
+/* =====================================================================
+   Onboarding
+   ===================================================================== */
+var ob = null, obIndex = 0;
+function obSteps(){ return ob.method === "custom" ? ["name","method","custom","food","result"] : ["name","method","body","activity","goal","food","result"]; }
+function startOnboarding(){
+  var base = freshState();
+  ob = {
+    name:state.name || "", method:"calc",
+    units:Object.assign({}, state.units),
+    sex:state.body.sex || "", age:state.body.age || "", heightCm:state.body.heightCm || "", weightKg:state.body.weightKg || "",
+    activity:state.activity || "moderate", workoutDays:state.workoutDays != null ? state.workoutDays : 4,
+    goal:state.goal || "maintain", pace:state.pace || "standard",
+    custom:state.onboarded ? JSON.parse(JSON.stringify(state.custom)) :
+      { training:{kcal:null,protein:null,carbs:null,fat:null}, rest:{kcal:null,protein:null,carbs:null,fat:null} },
+    diet:state.diet || "nonveg", avoid:(state.avoid || []).slice(), mealsPerDay:state.mealsPerDay || 4
+  };
+  obIndex = 0;
+  $("mainView").hidden = true; $("avatarBtn").hidden = true; $("obView").hidden = false;
+  renderOb();
+}
+function obBody(){ return { sex:ob.sex, age:+ob.age, heightCm:+ob.heightCm, weightKg:+ob.weightKg }; }
+function obValid(step){
+  if(step === "name") return ob.name.trim().length > 0;
+  if(step === "body") return hasBody(obBody()) && +ob.age <= 100 && +ob.heightCm <= 250 && +ob.weightKg <= 300;
+  if(step === "custom") return ["training","rest"].every(function(k){ var m = ob.custom[k]; return m.protein > 0 && m.carbs >= 0 && m.fat > 0; });
+  return true;
+}
+function optBtn(group, val, title, desc, pressed, badge){
+  return '<button type="button" class="opt" data-g="' + group + '" data-v="' + val + '" aria-pressed="' + (pressed ? "true" : "false") + '">' +
+    (badge ? '<span class="badge">' + esc(badge) + '</span>' : "") +
+    '<span class="radio"></span><span><span class="t">' + esc(title) + '</span>' + (desc ? '<span class="d" style="display:block">' + esc(desc) + '</span>' : "") + '</span></button>';
+}
+function segBtns(group, opts, cur){
+  return '<div class="seg" role="group">' + opts.map(function(o){
+    return '<button type="button" data-g="' + group + '" data-v="' + o[0] + '" aria-pressed="' + (String(cur) === String(o[0]) ? "true" : "false") + '">' + esc(o[1]) + '</button>';
+  }).join("") + '</div>';
+}
+function macroInputs(prefix, m){
+  return ["kcal","protein","carbs","fat"].map(function(k){
+    return '<input type="number" inputmode="numeric" min="0" id="' + prefix + "-" + k + '" data-mk="' + prefix + ":" + k + '" value="' + (m[k] != null ? Math.round(m[k]) : "") + '" aria-label="' + prefix + " " + k + '">';
+  }).join("");
+}
+function heightInputs(units, cm, idPrefix){
+  if(units.height === "ftin"){
+    var f = cm ? cmToFtIn(+cm) : { ft:"", inch:"" };
+    return '<div class="row2"><div class="input-unit"><input class="input" type="number" inputmode="numeric" id="' + idPrefix + 'Ft" value="' + f.ft + '" min="3" max="8" aria-label="Height feet"><span class="u">ft</span></div>' +
+           '<div class="input-unit"><input class="input" type="number" inputmode="numeric" id="' + idPrefix + 'In" value="' + f.inch + '" min="0" max="11" aria-label="Height inches"><span class="u">in</span></div></div>';
+  }
+  return '<div class="input-unit"><input class="input" type="number" inputmode="numeric" id="' + idPrefix + 'Cm" value="' + (cm ? Math.round(cm) : "") + '" min="120" max="250" aria-label="Height in centimetres"><span class="u">cm</span></div>';
+}
+
+function renderOb(){
+  var steps = obSteps(), step = steps[obIndex], html = "";
+  var prog = steps.map(function(_, i){ return '<span class="' + (i <= obIndex ? "done" : "") + '"></span>'; }).join("");
+  var nextLabel = "Continue", foot = "";
+
+  if(step === "name"){
+    html = '<div class="welcome-mark">' + markSVG() + '</div>' +
+      '<h1>Cook with what you have.<br>Hit your macros.</h1>' +
+      '<p class="lede">Tell us a little about you once. Every time you cook, pick what’s in your kitchen and get three dishes sized to your goal.</p>' +
+      '<div class="ob-body"><div class="field"><label for="obName">What should we call you?</label>' +
+      '<input class="input" id="obName" type="text" maxlength="30" autocomplete="given-name" placeholder="Your first name" value="' + esc(ob.name) + '"></div></div>';
+    nextLabel = "Get started";
+  }
+  else if(step === "method"){
+    html = '<h1>How should we set your targets?</h1><p class="lede">Most people don’t know their macros. We can work them out from your body and goal.</p>' +
+      '<div class="ob-body"><div class="options">' +
+      optBtn("method","calc","Calculate for me","Answer 4 quick questions: body, activity, goal, food", ob.method === "calc", "Recommended") +
+      optBtn("method","custom","I already know my macros","Type in your own training and rest day numbers", ob.method === "custom") +
+      '</div></div>';
+  }
+  else if(step === "body"){
+    var wVal = ob.weightKg ? Math.round(kgTo(ob.units.weight, +ob.weightKg)*10)/10 : "";
+    html = '<h1>About you</h1><p class="lede">Used only to estimate how much energy your body burns. Stays on this device.</p>' +
+      '<div class="ob-body">' +
+      '<div class="field"><span class="lab">Sex</span><div class="options two">' +
+        optBtn("sex","male","Male","", ob.sex === "male") + optBtn("sex","female","Female","", ob.sex === "female") + '</div>' +
+        '<span class="help">The calorie formula differs by sex.</span></div>' +
+      '<div class="field"><label for="obAge">Age</label><div class="input-unit"><input class="input" id="obAge" type="number" inputmode="numeric" min="14" max="100" value="' + esc(ob.age) + '"><span class="u">yrs</span></div></div>' +
+      '<div class="field"><div class="row-lab"><span class="lab">Height</span>' + segBtns("hunit", [["cm","cm"],["ftin","ft / in"]], ob.units.height) + '</div>' + heightInputs(ob.units, ob.heightCm, "obH") + '</div>' +
+      '<div class="field"><div class="row-lab"><label for="obW" class="lab">Weight</label>' + segBtns("wunit", [["kg","kg"],["lb","lb"]], ob.units.weight) + '</div>' +
+        '<div class="input-unit"><input class="input" id="obW" type="number" inputmode="decimal" step="0.1" value="' + wVal + '"><span class="u">' + ob.units.weight + '</span></div></div>' +
+      '</div>';
+  }
+  else if(step === "activity"){
+    html = '<h1>How active are you?</h1><p class="lede">Think about a typical week, workouts included.</p><div class="ob-body"><div class="options">' +
+      Object.keys(ACTIVITY).map(function(k){ return optBtn("activity", k, ACTIVITY[k].t, ACTIVITY[k].d, ob.activity === k); }).join("") +
+      '</div><div class="field"><span class="lab">Workout days per week</span>' +
+      '<div style="display:flex;align-items:center;gap:12px"><div class="stepper"><button type="button" data-step="wd:-1" aria-label="Fewer workout days">−</button><span class="val" id="obWd">' + ob.workoutDays + '</span><button type="button" data-step="wd:1" aria-label="More workout days">+</button></div>' +
+      '<span class="help">Training days get a little more food, rest days a little less.</span></div></div></div>';
+  }
+  else if(step === "goal"){
+    html = '<h1>What’s the goal?</h1><p class="lede">You can change this any time from your profile.</p><div class="ob-body"><div class="options">' +
+      Object.keys(GOALS).map(function(k){ return optBtn("goal", k, GOALS[k].t, GOALS[k].d, ob.goal === k); }).join("") + '</div>';
+    if(ob.goal === "lose" || ob.goal === "gain"){
+      var pk = PACES[ob.goal], wkg = +ob.weightKg || 70;
+      html += '<div class="field"><span class="lab">Pace</span><div class="options">' +
+        Object.keys(pk).map(function(k){
+          var perWeek = wkg*pk[k].r;
+          var txt = (ob.goal === "lose" ? "About −" : "About +") + fmtWeight(perWeek, ob.units.weight) + " a week";
+          return optBtn("pace", k, pk[k].t, txt, ob.pace === k);
+        }).join("") + '</div></div>';
+    }
+    html += '</div>';
+  }
+  else if(step === "custom"){
+    html = '<h1>Your daily numbers</h1><p class="lede">Enter what your plan says. Calories fill in from the macros if you leave them blank.</p>' +
+      '<div class="ob-body"><div class="card" style="padding:14px"><div class="tgt-grid">' +
+      '<span></span><span class="h">kcal</span><span class="h">Protein</span><span class="h">Carbs</span><span class="h">Fat</span>' +
+      '<span class="d">' + icon("dumbbell") + 'Training</span>' + macroInputs("training", ob.custom.training) +
+      '<span class="d">' + icon("moon") + 'Rest</span>' + macroInputs("rest", ob.custom.rest) +
+      '</div></div><p class="ob-note">Protein, carbs and fat in grams. Tip: if you only have one set of numbers, use it for both rows.</p></div>';
+  }
+  else if(step === "food"){
+    html = '<h1>How do you eat?</h1><p class="lede">So we never suggest something you won’t cook.</p><div class="ob-body">' +
+      '<div class="field"><span class="lab">Diet</span><div class="options two">' +
+      Object.keys(DIETS).map(function(k){ return optBtn("diet", k, DIETS[k].t, DIETS[k].d, ob.diet === k); }).join("") + '</div></div>' +
+      '<div class="field"><span class="lab">Anything to avoid?</span><div class="chips">' +
+      AVOIDS.map(function(a){ return '<button type="button" class="chip sel-green" data-avoid="' + esc(a[0]) + '" aria-pressed="' + (ob.avoid.indexOf(a[0]) !== -1) + '">' + esc(a[0]) + '</button>'; }).join("") + '</div></div>' +
+      '<div class="field"><span class="lab">Meals per day</span><div style="display:flex;align-items:center;gap:12px"><div class="stepper"><button type="button" data-step="meals:-1" aria-label="Fewer meals">−</button><span class="val" id="obMeals">' + ob.mealsPerDay + '</span><button type="button" data-step="meals:1" aria-label="More meals">+</button></div><span class="help">We size each dish to one meal.</span></div></div>' +
+      '</div>';
+    nextLabel = "See my targets";
+  }
+  else if(step === "result"){
+    html = renderObResult();
+    nextLabel = "Start cooking";
+  }
+
+  var valid = obValid(step);
+  $("obView").innerHTML =
+    '<div class="ob"><div class="ob-top"><button type="button" class="ob-back" id="obBack" aria-label="Back" ' + (obIndex === 0 ? "disabled" : "") + '>' + icon("left") + '</button>' +
+    '<div class="ob-progress" aria-label="Step ' + (obIndex+1) + ' of ' + steps.length + '">' + prog + '</div></div>' +
+    '<div class="ob-step">' + html + '</div>' +
+    '<div class="ob-foot"><button type="button" class="btn btn-primary btn-block" id="obNext" ' + (valid ? "" : "disabled") + '>' + nextLabel + ' ' + icon("arrow") + '</button>' + foot + '</div></div>';
+  var first = $("obView").querySelector("input");
+  if(first && (step === "name" || step === "body")) setTimeout(function(){ if(document.activeElement === document.body) first.focus(); }, 30);
+}
+function renderObResult(){
+  if(ob.method === "custom"){
+    var t = ob.custom.training, r = ob.custom.rest;
+    return '<h1>You’re set, ' + esc(ob.name.trim()) + '</h1><p class="lede">We’ll split these across ' + ob.mealsPerDay + ' meals and size every dish to fit.</p><div class="ob-body">' +
+      dayCards(t, r) + '<p class="ob-note">Want us to calculate them instead? Add your body stats any time from Profile.</p></div>';
+  }
+  var c = calcTargets({ sex:ob.sex, age:+ob.age, heightCm:+ob.heightCm, weightKg:+ob.weightKg, activity:ob.activity, workoutDays:ob.workoutDays, goal:ob.goal, pace:ob.pace });
+  var a = c.average, pk = a.protein*4, ck = a.carbs*4, fk = a.fat*9, tot = pk + ck + fk;
+  var html = '<h1>Your daily targets</h1><p class="lede">Built for <b>' + esc(GOALS[ob.goal].t.toLowerCase()) + '</b>. These are starting estimates; check your weight trend after 2–3 weeks and adjust.</p><div class="ob-body">' +
+    '<div class="result-hero"><span class="eyebrow">Average day</span><div class="kc num">' + fmt(a.kcal) + '<small>kcal</small></div>' +
+    '<div class="split"><span style="width:' + (pk/tot*100) + '%;background:var(--protein)"></span><span style="width:' + (ck/tot*100) + '%;background:var(--carbs)"></span><span style="width:' + (fk/tot*100) + '%;background:var(--fat)"></span></div>' +
+    '<div class="result-legend"><div><b class="num">' + a.protein + 'g</b>Protein</div><div><b class="num">' + a.carbs + 'g</b>Carbs</div><div><b class="num">' + a.fat + 'g</b>Fat</div></div></div>';
+  if(c.workoutDays >= 1 && c.workoutDays <= 6) html += dayCards(c.training, c.rest);
+  html += howItWorks(c, ob.units);
+  if(c.floored) html += '<p class="ob-warn">We kept calories at a safe minimum of ' + fmt(c.avg) + ' kcal. Going lower is best done with a doctor or dietitian.</p>';
+  if(c.bmi < 18.5 && ob.goal === "lose") html += '<p class="ob-warn">Your BMI is under 18.5. Maintaining or building muscle may suit you better than losing weight.</p>';
+  return html + '</div>';
+}
+function dayCards(t, r){
+  return '<div class="daycards">' +
+    '<div class="daycard"><div class="h">' + icon("dumbbell") + 'Training day</div><div class="k num">' + fmt(t.kcal) + ' kcal</div><div class="m">' + Math.round(t.protein) + 'P · ' + Math.round(t.carbs) + 'C · ' + Math.round(t.fat) + 'F</div></div>' +
+    '<div class="daycard"><div class="h">' + icon("moon") + 'Rest day</div><div class="k num">' + fmt(r.kcal) + ' kcal</div><div class="m">' + Math.round(r.protein) + 'P · ' + Math.round(r.carbs) + 'C · ' + Math.round(r.fat) + 'F</div></div></div>';
+}
+function howItWorks(c, units){
+  var adjTxt = c.adj === 0 ? "No change" : (c.adj > 0 ? "+" : "−") + fmt(Math.abs(c.adj)) + " kcal";
+  return '<details class="how"><summary>How we worked this out ' + icon("down") + '</summary><div class="how-body">' +
+    '<div class="how-row"><span>Resting burn (Mifflin-St Jeor)</span><span>' + fmt(c.bmr) + ' kcal</span></div>' +
+    '<div class="how-row"><span>With your activity</span><span>' + fmt(c.tdee) + ' kcal</span></div>' +
+    '<div class="how-row"><span>Goal adjustment</span><span>' + adjTxt + '</span></div>' +
+    '<div class="how-row"><span>Protein</span><span>' + c.proteinPerKg + ' g per kg' + (c.refWeight < c.weight - 0.5 ? ' of a ' + fmtWeight(c.refWeight, units.weight) + ' reference weight' : ' of body weight') + '</span></div>' +
+    '<div class="how-row"><span>Fat</span><span>~27% of calories</span></div>' +
+    '<div class="how-row"><span>Carbs</span><span>The rest of your calories</span></div>' +
+    '</div></details>';
+}
+
+function obReadInputs(){
+  var step = obSteps()[obIndex];
+  if(step === "name"){ var n = $("obName"); if(n) ob.name = n.value; }
+  if(step === "body"){
+    var a = $("obAge"); if(a) ob.age = a.value;
+    if(ob.units.height === "ftin"){ var ft = +($("obHFt")||{}).value, inch = +($("obHIn")||{}).value || 0; ob.heightCm = ft ? ftInToCm(ft, inch) : ""; }
+    else { var hc = $("obHCm"); if(hc) ob.heightCm = hc.value; }
+    var w = $("obW"); if(w) ob.weightKg = w.value ? toKg(ob.units.weight, +w.value) : "";
+  }
+  if(step === "custom"){
+    Array.prototype.forEach.call($("obView").querySelectorAll("[data-mk]"), function(inp){
+      var p = inp.getAttribute("data-mk").split(":"); ob.custom[p[0]][p[1]] = inp.value === "" ? null : +inp.value;
+    });
+  }
+}
+function obRefreshNext(){ var b = $("obNext"); if(b) b.disabled = !obValid(obSteps()[obIndex]); }
+
+function finishOnboarding(){
+  state.name = ob.name.trim();
+  state.units = ob.units;
+  state.diet = ob.diet; state.avoid = ob.avoid.slice(); state.mealsPerDay = ob.mealsPerDay;
+  if(ob.method === "calc"){
+    state.targetMode = "auto";
+    state.body = { sex:ob.sex, age:+ob.age, heightCm:+ob.heightCm, weightKg:Math.round(+ob.weightKg*10)/10 };
+    state.activity = ob.activity; state.workoutDays = ob.workoutDays; state.goal = ob.goal; state.pace = ob.pace;
+    logWeightEntry(state.body.weightKg);
+  } else {
+    state.targetMode = "custom";
+    ["training","rest"].forEach(function(k){
+      var m = ob.custom[k], P = +m.protein||0, C = +m.carbs||0, F = +m.fat||0;
+      state.custom[k] = { protein:P, carbs:C, fat:F, kcal:m.kcal ? +m.kcal : P*4 + C*4 + F*9 };
+    });
+  }
+  state.onboarded = true;
+  save();
+  showMain();
+  toast("Targets saved. Let’s cook.");
+}
+
+$("obView").addEventListener("click", function(e){
+  var t = e.target.closest("button"); if(!t) return;
+  obReadInputs();
+  if(t.id === "obBack"){ if(obIndex > 0){ obIndex--; renderOb(); } return; }
+  if(t.id === "obNext"){
+    var steps = obSteps();
+    if(!obValid(steps[obIndex])) return;
+    if(obIndex === steps.length - 1){ finishOnboarding(); return; }
+    obIndex++; renderOb(); window.scrollTo(0, 0); return;
+  }
+  var g = t.getAttribute("data-g"), v = t.getAttribute("data-v");
+  if(g){
+    if(g === "hunit" || g === "wunit"){ ob.units[g === "hunit" ? "height" : "weight"] = v; renderOb(); return; }
+    ob[g] = v;
+    if(g === "goal"){ renderOb(); return; }
+    setPressed(t.parentElement, "data-v", v);
+    obRefreshNext(); return;
+  }
+  var av = t.getAttribute("data-avoid");
+  if(av){
+    var i = ob.avoid.indexOf(av); if(i === -1) ob.avoid.push(av); else ob.avoid.splice(i, 1);
+    t.setAttribute("aria-pressed", i === -1 ? "true" : "false"); return;
+  }
+  var st = t.getAttribute("data-step");
+  if(st){
+    var p = st.split(":"), d = +p[1];
+    if(p[0] === "wd"){ ob.workoutDays = Math.max(0, Math.min(7, ob.workoutDays + d)); $("obWd").textContent = ob.workoutDays; }
+    if(p[0] === "meals"){ ob.mealsPerDay = Math.max(1, Math.min(8, ob.mealsPerDay + d)); $("obMeals").textContent = ob.mealsPerDay; }
+  }
+});
+$("obView").addEventListener("input", function(){ obReadInputs(); obRefreshNext(); });
+$("obView").addEventListener("keydown", function(e){
+  if(e.key === "Enter" && e.target.tagName === "INPUT"){ e.preventDefault(); var b = $("obNext"); if(b && !b.disabled) b.click(); }
+});
+
+/* =====================================================================
+   Main view
+   ===================================================================== */
+var activeCat = "protein";
+var shownCount = 0, exampleShown = false; // only newly arrived cards animate
+var gen = { status:"idle", dishes:[], error:"", ctl:null, target:null, summary:[] };
+var openRecipe = {};
+
+function showMain(){
+  $("obView").hidden = true; $("mainView").hidden = false; $("avatarBtn").hidden = false;
+  renderAll();
+}
+function renderAll(){
+  renderAvatar(); renderGreeting(); renderDay(); renderTarget(); renderFocus();
+  renderKitchen(); renderPrefs(); renderCTA(); renderResults(); renderRecent();
+}
+function renderAvatar(){ $("avatarInitial").textContent = (state.name || "?").trim().charAt(0).toUpperCase() || "?"; }
+function renderGreeting(){
+  var h = new Date().getHours();
+  var g = h < 5 ? "Late night cravings" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+  $("greetTitle").textContent = g + (state.name ? ", " + state.name : "");
+  var goalTxt = GOALS[state.goal] ? GOALS[state.goal].t : "";
+  $("greetSub").textContent = new Date().toLocaleDateString("en-US", { weekday:"long", month:"short", day:"numeric" }) + (goalTxt ? " · " + goalTxt : "");
+}
+function renderDay(){ setPressed(document.querySelector('.greet .seg'), "data-day", state.dayType); }
+function renderTarget(){
+  var t = mealTarget(), d = dailyTargets()[state.dayType === "rest" ? "rest" : "training"];
+  $("mealKcal").innerHTML = fmt(t.kcal) + "<small>kcal</small>";
+  $("mealCaption").textContent = "1 of " + state.mealsPerDay + " meals · " + FOCUS_LABEL[state.focus].toLowerCase();
+  $("mealMacros").innerHTML = [
+    ["Protein", t.protein, "var(--protein)"], ["Carbs", t.carbs, "var(--carbs)"], ["Fat", t.fat, "var(--fat)"]
+  ].map(function(m){ return '<div class="macro-line"><span class="dot" style="background:' + m[2] + '"></span><span class="k">' + m[0] + '</span><span class="v">' + Math.round(m[1]) + 'g</span></div>'; }).join("");
+  $("dailyLine").textContent = (state.dayType === "rest" ? "Rest" : "Training") + " day total: " + fmt(d.kcal) + " kcal · " + Math.round(d.protein) + "P " + Math.round(d.carbs) + "C " + Math.round(d.fat) + "F" + (state.targetMode === "custom" ? " (your numbers)" : "");
+  $("findMeta").textContent = "~" + fmt(t.kcal) + " kcal";
+}
+function renderFocus(){ setPressed($("focusChips"), "data-focus", state.focus); }
+function renderPrefs(){ setPressed($("timeChips"), "data-time", state.time); setPressed($("moodChips"), "data-mood", state.mood); }
+
+function renderKitchen(){
+  var k = state.kitchen;
+  $("kitchenCount").textContent = k.length + (k.length === 1 ? " item" : " items") + " picked";
+  $("clearKitchen").hidden = k.length === 0;
+  var box = $("selectedBox");
+  if(!k.length){ box.innerHTML = '<span class="empty-note">Nothing picked yet. Tap staples below or search.</span>'; }
+  else {
+    box.innerHTML = k.map(function(item, i){
+      return '<span class="pick">' + esc(item) + '<button type="button" data-remove="' + i + '" aria-label="Remove ' + esc(item) + '">' + icon("x") + '</button></span>';
+    }).join("");
+  }
+  $("catTabs").innerHTML = CATS.map(function(c){
+    var n = visibleStaples(c.id).filter(function(s){ return k.indexOf(s) !== -1; }).length;
+    return '<button type="button" role="tab" data-cat="' + c.id + '" aria-selected="' + (c.id === activeCat) + '">' + c.t + (n ? '<span class="count">' + n + '</span>' : "") + '</button>';
+  }).join("");
+  $("stapleChips").innerHTML = visibleStaples(activeCat).map(function(s){
+    return '<button type="button" class="chip sel-green" data-staple="' + esc(s) + '" aria-pressed="' + (k.indexOf(s) !== -1) + '">' + esc(s) + '</button>';
+  }).join("");
+  renderCTA();
+}
+function toggleItem(item){
+  var i = state.kitchen.indexOf(item);
+  if(i === -1) state.kitchen.push(item); else state.kitchen.splice(i, 1);
+  save(); renderKitchen();
+}
+function addItem(raw){
+  var v = String(raw || "").trim().replace(/\s+/g, " ");
+  if(!v) return;
+  var match = allVisibleStaples().filter(function(s){ return s.toLowerCase() === v.toLowerCase(); })[0];
+  v = match || (v.charAt(0).toUpperCase() + v.slice(1));
+  if(state.kitchen.map(function(s){ return s.toLowerCase(); }).indexOf(v.toLowerCase()) === -1){ state.kitchen.push(v); save(); }
+  renderKitchen();
+}
+var sugIndex = -1;
+function renderSuggest(){
+  var q = $("kitchenSearch").value.trim().toLowerCase(), box = $("suggestBox");
+  if(!q){ box.hidden = true; return; }
+  var have = state.kitchen.map(function(s){ return s.toLowerCase(); });
+  var hits = allVisibleStaples().filter(function(s){ return s.toLowerCase().indexOf(q) !== -1 && have.indexOf(s.toLowerCase()) === -1; }).slice(0, 6);
+  var exact = allVisibleStaples().some(function(s){ return s.toLowerCase() === q; }) || have.indexOf(q) !== -1;
+  var html = hits.map(function(s, i){ return '<button type="button" role="option" data-add="' + esc(s) + '" class="' + (i === sugIndex ? "active" : "") + '">' + icon("plus") + esc(s) + '</button>'; }).join("");
+  if(!exact) html += '<button type="button" role="option" data-add="' + esc($("kitchenSearch").value.trim()) + '" class="' + (sugIndex === hits.length ? "active" : "") + '">' + icon("plus") + 'Add “' + esc($("kitchenSearch").value.trim()) + '”<span class="hint">custom</span></button>';
+  box.innerHTML = html; box.hidden = !html;
+}
+function renderCTA(){
+  var empty = state.kitchen.length === 0, busy = gen.status === "loading";
+  $("findBtn").disabled = empty || busy;
+  $("findHint").hidden = !empty;
+}
+
+/* ---------- Results ---------- */
+var EXAMPLE_BASE = { name:"Soy chunk & chana masala bowl", tagline:"Smoky tomato masala over rice, high protein without meat.", minutes:25,
+  uses:["Soy chunks","Chana","Onion","Tomato","Rice"], extra:["Coriander"],
+  steps:["Soak soy chunks in hot salted water for 10 minutes, then squeeze dry.","Sauté onion in 1 tsp oil until golden; add ginger-garlic and masala.","Add chopped tomato and cook down to a thick masala.","Stir in soy chunks and chana with a splash of water; simmer 8 minutes.","Serve over rice and finish with lemon and coriander."] };
+// The example is sized to the viewer's own meal target so it shows what a good fit looks like.
+function exampleDish(t){
+  var d = Object.assign({}, EXAMPLE_BASE);
+  d.protein = Math.round(t.protein*0.96); d.carbs = Math.round(t.carbs*1.05); d.fat = Math.round(t.fat*0.92);
+  d.kcal = d.protein*4 + d.carbs*4 + d.fat*9;
+  return d;
+}
+
+function matchScore(d, t){
+  var e = function(a, b){ return Math.abs(a - b)/Math.max(b, 1); };
+  var err = 0.3*e(d.kcal, t.kcal) + 0.4*e(d.protein, t.protein) + 0.15*e(d.carbs, t.carbs) + 0.15*e(d.fat, t.fat);
+  return Math.max(0, Math.min(100, Math.round(100*(1 - err))));
+}
+function dishHTML(d, idx, t, isExample, isNew){
+  var score = matchScore(d, t), cls = score >= 88 ? "" : score >= 72 ? " mid" : " low";
+  var lab = score >= 88 ? "Great fit" : score >= 72 ? "Good fit" : "Loose fit";
+  function bar(k, label, color){
+    var v = d[k], goal = t[k], max = Math.max(v, goal)*1.15 || 1;
+    return '<div class="bar-row"><span class="k">' + label + '</span><div class="track"><span class="fill" style="width:' + (v/max*100) + '%;background:' + color + '"></span><span class="goal" style="left:' + (goal/max*100) + '%" title="Target"></span></div><span class="v"><b>' + Math.round(v) + '</b> / ' + Math.round(goal) + 'g</span></div>';
+  }
+  var cooked = state.recentlyMade.some(function(r){ return r.name === d.name; });
+  var open = !!openRecipe[(isExample ? "ex:" : "") + d.name];
+  return '<article class="dish' + (isNew ? ' enter' : '') + '">' +
+    '<div class="dish-top"><div>' + (isExample ? '<span class="example-badge">Example</span>' : "") +
+      '<h3>' + esc(d.name) + '</h3>' + (d.tagline ? '<p class="tagline">' + esc(d.tagline) + '</p>' : "") + '</div>' +
+      '<div class="match' + cls + '"><div class="pct num">' + score + '%</div><div class="lab">' + lab + '</div></div></div>' +
+    '<div class="dish-meta">' +
+      '<span class="tag">' + icon("flame") + '<span class="num">' + fmt(d.kcal) + ' kcal</span></span>' +
+      (d.minutes ? '<span class="tag">' + icon("clock") + '<span class="num">' + Math.round(d.minutes) + ' min</span></span>' : "") +
+    '</div>' +
+    '<div class="bars">' + bar("protein","Protein","var(--protein)") + bar("carbs","Carbs","var(--carbs)") + bar("fat","Fat","var(--fat)") + '</div>' +
+    '<div class="dish-ings">' +
+      (d.uses.length ? '<div class="ing-group"><span class="eyebrow">From your kitchen</span><div class="ing-list">' + d.uses.map(function(u){ return '<span class="ing">' + esc(u) + '</span>'; }).join("") + '</div></div>' : "") +
+      (d.extra.length ? '<div class="ing-group"><span class="eyebrow">You’ll also need</span><div class="ing-list">' + d.extra.map(function(u){ return '<span class="ing need">' + esc(u) + '</span>'; }).join("") + '</div></div>' : "") +
+    '</div>' +
+    '<div class="dish-actions">' +
+      '<button type="button" class="btn btn-ghost" data-recipe="' + esc((isExample ? "ex:" : "") + d.name) + '" aria-expanded="' + open + '">' + icon("book") + (open ? "Hide recipe" : "View recipe") + '</button>' +
+      (isExample ? "" : '<button type="button" class="btn btn-ghost btn-cooked" data-cooked="' + esc(d.name) + '" aria-pressed="' + cooked + '">' + icon("check") + (cooked ? "Cooked" : "Cooked this") + '</button>') +
+    '</div>' +
+    '<div class="recipe' + (open ? " open" : "") + '"><ol>' + d.steps.map(function(s){ return '<li><span>' + esc(s) + '</span></li>'; }).join("") + '</ol></div>' +
+  '</article>';
+}
+function skeletonHTML(){
+  return '<div class="skel" aria-hidden="true"><div class="sk" style="width:62%;height:18px"></div><div class="sk" style="width:85%"></div><div class="sk" style="width:40%"></div><div class="sk" style="height:8px"></div><div class="sk" style="height:8px;width:80%"></div><div class="sk" style="height:8px;width:65%"></div></div>';
+}
+function summaryTags(){
+  var t = gen.target || mealTarget(), tags = ['<span class="tag">' + icon("flame") + '<span class="num">~' + fmt(t.kcal) + ' kcal</span></span>'];
+  var s = gen.summary.length ? gen.summary : [FOCUS_LABEL[state.focus], state.time !== "any" ? "≤ " + state.time + " min" : "", MOOD_LABEL[state.mood]];
+  s.forEach(function(x){ if(x) tags.push('<span class="tag">' + esc(x) + '</span>'); });
+  return tags.join("");
+}
+function renderResults(){
+  var body = $("resultsBody"), t = gen.target || mealTarget(), html = "";
+  if(gen.status === "idle"){
+    html = '<div class="idle"><div class="idle-hero">' + markSVG() + '<div><h2>Your next meal, sorted</h2><p>Pick what’s in your kitchen and we’ll suggest three dishes that fit this meal’s macros. Here’s what one looks like.</p></div></div></div>' +
+      '<div style="margin-top:16px">' + dishHTML(exampleDish(mealTarget()), 0, mealTarget(), true, !exampleShown) + '</div>';
+  } else {
+    html = '<div class="res-head"><div><h2>' + (gen.status === "loading" ? "Finding dishes…" : gen.status === "error" && !gen.dishes.length ? "No dishes yet" : "Dishes for you") + '</h2><div class="res-tags">' + summaryTags() + '</div></div>';
+    if(gen.status === "loading") html += '<button type="button" class="btn btn-ghost" id="stopBtn" style="padding:9px 14px;font-size:14px">' + icon("stop") + 'Stop</button>';
+    else if(gen.dishes.length) html += '<button type="button" class="btn btn-ghost" id="againBtn" style="padding:9px 14px;font-size:14px">' + icon("refresh") + 'Show different</button>';
+    html += '</div><div style="display:grid;gap:14px;margin-top:14px">';
+    html += gen.dishes.map(function(d, i){ return dishHTML(d, i, t, false, i >= shownCount); }).join("");
+    if(gen.status === "loading"){
+      for(var i = gen.dishes.length; i < 3; i++) html += skeletonHTML();
+    }
+    html += '</div>';
+    if(gen.status === "loading" && !gen.dishes.length) html += '<div class="status-line" style="margin-top:12px"><span class="spinner"></span>Matching your kitchen to your macros…</div>';
+    if(gen.status === "error") html += '<div class="err" style="margin-top:14px"><p>' + esc(gen.error) + '</p>' + (gen.retry ? '<button type="button" class="btn btn-ghost" id="retryBtn" style="padding:9px 14px;font-size:14px">' + icon("refresh") + 'Try again</button>' : "") + '</div>';
+  }
+  body.innerHTML = html;
+  if(gen.status === "idle") exampleShown = true; else shownCount = gen.dishes.length;
+}
+function renderRecent(){
+  var list = state.recentlyMade || [];
+  $("recentList").innerHTML = list.length ? list.map(function(r, i){
+    return '<span class="recent">' + esc(r.name) + ' <span class="when">' + relTime(r.at) + '</span><button type="button" data-unrecent="' + i + '" aria-label="Remove ' + esc(r.name) + ' from history">' + icon("x") + '</button></span>';
+  }).join("") : '<span class="empty-note">Tap “Cooked this” on a dish and we’ll keep suggestions fresh.</span>';
+}
+
+/* ---------- Generation ----------
+   The page sends structured choices to /api/dishes; the server builds the prompt,
+   calls the AI model with the secret key, and streams back one JSON dish per line. */
+function buildPayload(t, shown){
+  return {
+    target:{ kcal:Math.round(t.kcal), protein:Math.round(t.protein), carbs:Math.round(t.carbs), fat:Math.round(t.fat) },
+    kitchen:state.kitchen.slice(0, 60),
+    diet:state.diet, avoid:(state.avoid || []).slice(0, 10),
+    time:state.time, mood:state.mood,
+    recent:state.recentlyMade.map(function(r){ return r.name; }).slice(0, 10),
+    shown:(shown || []).slice(0, 6)
+  };
+}
+function normDish(o){
+  if(!o || typeof o !== "object" || !o.name) return null;
+  var P = Math.max(0, +o.protein || 0), C = Math.max(0, +o.carbs || 0), F = Math.max(0, +o.fat || 0);
+  return {
+    name:String(o.name).slice(0, 80), tagline:o.tagline ? String(o.tagline).slice(0, 140) : "",
+    minutes:+o.minutes || 0, protein:P, carbs:C, fat:F, kcal:P*4 + C*4 + F*9,
+    uses:Array.isArray(o.uses) ? o.uses.map(String).slice(0, 12) : [],
+    extra:Array.isArray(o.extra) ? o.extra.map(String).slice(0, 4) : [],
+    steps:Array.isArray(o.steps) ? o.steps.map(String).slice(0, 8) : []
+  };
+}
+function tryParseLine(line){
+  line = line.trim().replace(/^```(json)?/i, "").replace(/```$/, "").replace(/,$/, "").trim();
+  if(!line || line.charAt(0) !== "{") return null;
+  try{ return normDish(JSON.parse(line)); }catch(e){ return null; }
+}
+function parseAll(text){
+  var out = [];
+  text.split("\n").forEach(function(l){ var d = tryParseLine(l); if(d) out.push(d); });
+  if(out.length) return out;
+  try{
+    var s = text.indexOf("["), e = text.lastIndexOf("]");
+    if(s !== -1 && e > s){ var arr = JSON.parse(text.slice(s, e+1)); if(Array.isArray(arr)) return arr.map(normDish).filter(Boolean); }
+    var s2 = text.indexOf("{"), e2 = text.lastIndexOf("}");
+    if(s2 !== -1 && e2 > s2){ var obj = JSON.parse(text.slice(s2, e2+1)); if(obj && Array.isArray(obj.dishes)) return obj.dishes.map(normDish).filter(Boolean); }
+  }catch(err){}
+  return out;
+}
+function generate(again){
+  if(gen.status === "loading" || !state.kitchen.length) return;
+  var t = mealTarget();
+  var shown = again ? gen.dishes.map(function(d){ return d.name; }) : [];
+  var ctl = new AbortController();
+  gen = { status:"loading", dishes:[], error:"", ctl:ctl, target:t, retry:true,
+          summary:[FOCUS_LABEL[state.focus], state.time !== "any" ? "≤ " + state.time + " min" : "", MOOD_LABEL[state.mood]] };
+  openRecipe = {}; shownCount = 0;
+  renderResults(); renderCTA();
+  if(window.matchMedia("(max-width: 979px)").matches) $("resultsPane").scrollIntoView({ behavior:"smooth", block:"start" });
+
+  var pending = "", full = "";
+  function eat(chunk){
+    full += chunk;
+    var lines = (pending + chunk).split("\n");
+    pending = lines.pop();
+    var added = false;
+    lines.forEach(function(l){ var d = tryParseLine(l); if(d && gen.dishes.length < 3){ gen.dishes.push(d); added = true; } });
+    if(added) renderResults();
+  }
+  function fail(msg, canRetry){
+    if(gen.ctl !== ctl) return;
+    gen.status = gen.dishes.length ? "done" : "error"; gen.error = msg; gen.retry = canRetry !== false;
+  }
+
+  fetch("/api/dishes", {
+    method:"POST", headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify(buildPayload(t, shown)), signal:ctl.signal
+  }).then(function(res){
+    if(!res.ok){
+      return res.text().then(function(body){
+        var msg = "";
+        try{ msg = JSON.parse(body).error || ""; }catch(e){}
+        if(res.status === 429) fail(msg || "Lots of requests right now. Wait a minute, then try again.");
+        else fail(msg || "The dish service had a problem. Try again in a moment.");
+      });
+    }
+    var reader = res.body.getReader(), dec = new TextDecoder();
+    function pump(){
+      return reader.read().then(function(r){
+        if(r.done){
+          eat(dec.decode());
+          var tail = tryParseLine(pending); if(tail && gen.dishes.length < 3) gen.dishes.push(tail);
+          if(!gen.dishes.length) gen.dishes = parseAll(full).slice(0, 3);
+          if(gen.ctl !== ctl) return;
+          if(!gen.dishes.length) fail("The suggestions came back in a format we couldn’t read. Try again.");
+          else gen.status = "done";
+          return;
+        }
+        eat(dec.decode(r.value, { stream:true }));
+        return pump();
+      });
+    }
+    return pump();
+  }).catch(function(e){
+    if(gen.ctl !== ctl) return;
+    if(e && e.name === "AbortError"){ gen.status = gen.dishes.length ? "done" : "idle"; return; }
+    fail("Couldn’t reach the dish service. Check your connection and try again.");
+  }).finally(function(){
+    if(gen.ctl !== ctl) return;
+    gen.ctl = null; renderResults(); renderCTA();
+  });
+}
+function markCooked(name){
+  var i = -1; state.recentlyMade.forEach(function(r, j){ if(r.name === name) i = j; });
+  if(i !== -1){ state.recentlyMade.splice(i, 1); save(); renderRecent(); renderResults(); return false; }
+  state.recentlyMade.unshift({ name:name, at:Date.now() });
+  state.recentlyMade = state.recentlyMade.slice(0, 10);
+  save(); renderRecent(); renderResults(); return true;
+}
+
+/* ---------- Main events ---------- */
+document.querySelector(".greet .seg").addEventListener("click", function(e){
+  var b = e.target.closest("[data-day]"); if(!b) return;
+  state.dayType = b.getAttribute("data-day"); save(); renderDay(); renderTarget(); if(gen.status === "idle") renderResults();
+});
+$("focusChips").addEventListener("click", function(e){
+  var b = e.target.closest("[data-focus]"); if(!b) return;
+  state.focus = b.getAttribute("data-focus"); save(); renderFocus(); renderTarget(); if(gen.status === "idle") renderResults();
+});
+$("timeChips").addEventListener("click", function(e){ var b = e.target.closest("[data-time]"); if(!b) return; state.time = b.getAttribute("data-time"); save(); renderPrefs(); });
+$("moodChips").addEventListener("click", function(e){ var b = e.target.closest("[data-mood]"); if(!b) return; state.mood = b.getAttribute("data-mood"); save(); renderPrefs(); });
+$("catTabs").addEventListener("click", function(e){ var b = e.target.closest("[data-cat]"); if(!b) return; activeCat = b.getAttribute("data-cat"); renderKitchen(); });
+$("stapleChips").addEventListener("click", function(e){ var b = e.target.closest("[data-staple]"); if(!b) return; toggleItem(b.getAttribute("data-staple")); });
+$("selectedBox").addEventListener("click", function(e){
+  var b = e.target.closest("[data-remove]"); if(!b) return;
+  state.kitchen.splice(+b.getAttribute("data-remove"), 1); save(); renderKitchen();
+});
+$("clearKitchen").addEventListener("click", function(){ state.kitchen = []; save(); renderKitchen(); });
+$("kitchenSearch").addEventListener("input", function(){ sugIndex = -1; renderSuggest(); });
+$("kitchenSearch").addEventListener("keydown", function(e){
+  var box = $("suggestBox"), opts = box.querySelectorAll("[data-add]");
+  if(e.key === "ArrowDown" && opts.length){ e.preventDefault(); sugIndex = (sugIndex + 1) % opts.length; renderSuggest(); }
+  else if(e.key === "ArrowUp" && opts.length){ e.preventDefault(); sugIndex = (sugIndex - 1 + opts.length) % opts.length; renderSuggest(); }
+  else if(e.key === "Enter"){
+    e.preventDefault();
+    var pick = sugIndex >= 0 && opts[sugIndex] ? opts[sugIndex].getAttribute("data-add") : this.value;
+    addItem(pick); this.value = ""; sugIndex = -1; renderSuggest();
+  } else if(e.key === "Escape"){ this.value = ""; renderSuggest(); }
+});
+$("suggestBox").addEventListener("mousedown", function(e){ e.preventDefault(); });
+$("suggestBox").addEventListener("click", function(e){
+  var b = e.target.closest("[data-add]"); if(!b) return;
+  addItem(b.getAttribute("data-add")); $("kitchenSearch").value = ""; sugIndex = -1; renderSuggest(); $("kitchenSearch").focus();
+});
+$("kitchenSearch").addEventListener("blur", function(){ setTimeout(function(){ $("suggestBox").hidden = true; }, 120); });
+$("findBtn").addEventListener("click", function(){ generate(false); });
+$("resultsPane").addEventListener("click", function(e){
+  var b = e.target.closest("button"); if(!b) return;
+  if(b.id === "stopBtn"){ if(gen.ctl) gen.ctl.abort(); return; }
+  if(b.id === "againBtn"){ generate(true); return; }
+  if(b.id === "retryBtn"){ gen.status = "idle"; generate(false); return; }
+  var r = b.getAttribute("data-recipe");
+  if(r){ openRecipe[r] = !openRecipe[r]; renderResults(); var nb = $("resultsPane").querySelector('[data-recipe="' + CSS.escape(r) + '"]'); if(nb) nb.focus(); return; }
+  var c = b.getAttribute("data-cooked");
+  if(c){ var added = markCooked(c); toast(added ? "Saved to recently cooked" : "Removed from recently cooked"); var nb2 = $("resultsPane").querySelector('[data-cooked="' + CSS.escape(c) + '"]'); if(nb2) nb2.focus(); return; }
+  var u = b.getAttribute("data-unrecent");
+  if(u != null){ state.recentlyMade.splice(+u, 1); save(); renderRecent(); renderResults(); }
+});
+
+/* =====================================================================
+   Profile drawer
+   ===================================================================== */
+var pfBaseline = null, lastFocus = null, resetArmed = false, resetTimer = null;
+function openProfile(){
+  lastFocus = document.activeElement;
+  pfBaseline = JSON.parse(JSON.stringify(dailyTargets()));
+  renderProfile();
+  $("drawer").classList.add("open"); $("scrim").classList.add("open");
+  $("drawer").setAttribute("aria-hidden", "false");
+  $("mainView").setAttribute("inert", "");
+  setTimeout(function(){ var c = $("pfClose"); if(c) c.focus(); }, 60);
+}
+function closeProfile(){
+  $("drawer").classList.remove("open"); $("scrim").classList.remove("open");
+  $("drawer").setAttribute("aria-hidden", "true");
+  $("mainView").removeAttribute("inert");
+  if(lastFocus && lastFocus.focus) lastFocus.focus();
+}
+function pfSeg(group, opts, cur){
+  return '<div class="seg" role="group">' + opts.map(function(o){
+    return '<button type="button" data-pf="' + group + '" data-v="' + o[0] + '" aria-pressed="' + (String(cur) === String(o[0])) + '">' + esc(o[1]) + '</button>';
+  }).join("") + '</div>';
+}
+function renderProfile(){
+  var b = state.body, u = state.units;
+  var html =
+    '<div class="drawer-head"><span class="avatar" id="pfAvatar">' + esc((state.name || "?").charAt(0).toUpperCase()) + '</span>' +
+    '<div class="who"><input id="pfName" value="' + esc(state.name) + '" maxlength="30" aria-label="Your name"><div class="sub" id="pfSub">' + esc(GOALS[state.goal].t) + ' · ' + esc(DIETS[state.diet].t) + '</div></div>' +
+    '<button type="button" class="icon-btn" id="pfClose" aria-label="Close profile">' + icon("x") + '</button></div>' +
+    '<div class="drawer-body" id="pfBody">' +
+
+    '<section class="pf-card" id="pfTargets"></section>' +
+
+    '<section class="pf-card"><h3>Weight ' + icon("scale") + '</h3><div id="pfWeight"></div></section>' +
+
+    '<section class="pf-card"><h3>Body</h3>' +
+      '<div class="pf-row"><span class="lab">Sex</span>' + pfSeg("sex", [["male","Male"],["female","Female"]], b.sex) + '</div>' +
+      '<div class="pf-row"><label class="lab" for="pfAge">Age</label><div class="input-unit" style="max-width:150px"><input class="input" id="pfAge" type="number" inputmode="numeric" min="14" max="100" value="' + (b.age || "") + '"><span class="u">yrs</span></div></div>' +
+      '<div class="pf-row"><span class="lab">Height</span><div style="max-width:' + (u.height === "ftin" ? 190 : 150) + 'px;width:100%;display:flex;justify-content:flex-end" id="pfHeightWrap">' + heightInputs(u, b.heightCm, "pfH") + '</div></div>' +
+      '<div class="pf-row"><label class="lab" for="pfActivity">Activity</label><select class="input" id="pfActivity">' +
+        Object.keys(ACTIVITY).map(function(k){ return '<option value="' + k + '"' + (state.activity === k ? " selected" : "") + '>' + ACTIVITY[k].t + '</option>'; }).join("") + '</select></div>' +
+      '<div class="pf-row"><span class="lab">Workout days / week</span><div class="stepper"><button type="button" data-pfstep="wd:-1" aria-label="Fewer workout days">−</button><span class="val" id="pfWd">' + state.workoutDays + '</span><button type="button" data-pfstep="wd:1" aria-label="More workout days">+</button></div></div>' +
+    '</section>' +
+
+    '<section class="pf-card"><h3>Goal</h3>' +
+      '<div class="options two">' + Object.keys(GOALS).map(function(k){ return '<button type="button" class="opt" data-pf="goal" data-v="' + k + '" aria-pressed="' + (state.goal === k) + '" style="padding:12px"><span class="radio"></span><span><span class="t">' + GOALS[k].t + '</span></span></button>'; }).join("") + '</div>' +
+      '<div class="pf-row" id="pfPaceRow"' + (state.goal === "lose" || state.goal === "gain" ? "" : " hidden") + '><span class="lab">Pace</span>' + pfSeg("pace", [["gentle","Gentle"],["standard","Steady"],["fast","Faster"]], state.pace) + '</div>' +
+    '</section>' +
+
+    '<section class="pf-card"><h3>Food</h3>' +
+      '<div class="field"><span class="lab" style="font-size:13.5px;font-weight:600;color:var(--ink-2)">Diet</span>' + pfSeg("diet", [["nonveg","Non-veg"],["egg","Egg"],["veg","Veg"],["vegan","Vegan"]], state.diet).replace('class="seg"', 'class="seg full"') + '</div>' +
+      '<div class="field"><span class="lab" style="font-size:13.5px;font-weight:600;color:var(--ink-2)">Avoid</span><div class="chips">' +
+        AVOIDS.map(function(a){ return '<button type="button" class="chip sel-green" data-pfavoid="' + esc(a[0]) + '" aria-pressed="' + ((state.avoid || []).indexOf(a[0]) !== -1) + '">' + esc(a[0]) + '</button>'; }).join("") + '</div></div>' +
+      '<div class="pf-row"><span class="lab">Meals per day</span><div class="stepper"><button type="button" data-pfstep="meals:-1" aria-label="Fewer meals">−</button><span class="val" id="pfMeals">' + state.mealsPerDay + '</span><button type="button" data-pfstep="meals:1" aria-label="More meals">+</button></div></div>' +
+    '</section>' +
+
+    '<section class="pf-card"><h3>Units</h3>' +
+      '<div class="pf-row"><span class="lab">Weight</span>' + pfSeg("wunit", [["kg","kg"],["lb","lb"]], u.weight) + '</div>' +
+      '<div class="pf-row"><span class="lab">Height</span>' + pfSeg("hunit", [["cm","cm"],["ftin","ft / in"]], u.height) + '</div>' +
+    '</section>' +
+
+    '<section class="pf-card"><h3>Your data</h3><p style="font-size:13px;color:var(--muted)">Your profile is saved in this browser only. Nobody else who opens this link sees it. Ingredients and targets are sent to the AI only to suggest dishes.</p>' +
+      '<button type="button" class="btn danger-btn btn-block" id="pfReset">Start over</button></section>' +
+    '</div>';
+  var body = $("pfBody"), st = body ? body.scrollTop : 0;
+  $("drawer").innerHTML = html;
+  $("pfBody").scrollTop = st;
+  renderPfTargets(); renderPfWeight();
+}
+function deltaChip(now, before){
+  var d = Math.round(now - before);
+  if(!d) return "";
+  return '<span class="delta ' + (d > 0 ? "up" : "down") + '">' + (d > 0 ? "+" : "−") + fmt(Math.abs(d)) + '</span>';
+}
+function renderPfTargets(){
+  var box = $("pfTargets"); if(!box) return;
+  var dt = dailyTargets(), auto = state.targetMode === "auto";
+  var html = '<h3>Daily targets ' + pfSeg("mode", [["auto","Calculated"],["custom","My numbers"]], state.targetMode) + '</h3>';
+  if(auto && !hasBody()){
+    html += '<div class="nudge">' + icon("info") + '<span>Add your sex, age, height and weight below and we’ll calculate targets for you. Until then we use your own numbers.</span></div>';
+  }
+  if(auto && hasBody()){
+    var bt = pfBaseline ? pfBaseline.training : dt.training, br = pfBaseline ? pfBaseline.rest : dt.rest;
+    html += '<div class="tgt-grid"><span></span><span class="h">kcal</span><span class="h">P</span><span class="h">C</span><span class="h">F</span>' +
+      '<span class="d">' + icon("dumbbell") + 'Training</span><span class="c">' + fmt(dt.training.kcal) + '</span><span class="c">' + dt.training.protein + '</span><span class="c">' + dt.training.carbs + '</span><span class="c">' + dt.training.fat + '</span>' +
+      '<span class="d">' + icon("moon") + 'Rest</span><span class="c">' + fmt(dt.rest.kcal) + '</span><span class="c">' + dt.rest.protein + '</span><span class="c">' + dt.rest.carbs + '</span><span class="c">' + dt.rest.fat + '</span></div>';
+    var dd = deltaChip(dt.training.kcal, bt.kcal);
+    if(dd) html += '<p style="font-size:12.5px;color:var(--muted);display:flex;gap:6px;align-items:center">Updated from your changes ' + dd + '<span>kcal on training days</span></p>';
+    html += howItWorks(dt.calc, state.units);
+  } else if(!auto){
+    html += '<div class="tgt-grid"><span></span><span class="h">kcal</span><span class="h">P</span><span class="h">C</span><span class="h">F</span>' +
+      '<span class="d">' + icon("dumbbell") + 'Training</span>' + macroInputs("pf-training", state.custom.training).replace(/data-mk="pf-/g, 'data-pfmk="') +
+      '<span class="d">' + icon("moon") + 'Rest</span>' + macroInputs("pf-rest", state.custom.rest).replace(/data-mk="pf-/g, 'data-pfmk="') + '</div>' +
+      '<p style="font-size:12.5px;color:var(--muted)">Grams for protein, carbs and fat. Calories update from the macros.</p>';
+  }
+  box.innerHTML = html;
+}
+function sparkSVG(log, unit){
+  var pts = log.slice(-12);
+  if(pts.length < 2) return '<p style="font-size:12.5px;color:var(--muted)">Log your weight every week or two to see your trend here.</p>';
+  var W = 300, H = 72, pad = 8;
+  var vals = pts.map(function(p){ return kgTo(unit, p.kg); });
+  var min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+  if(max - min < 0.5){ max += 0.25; min -= 0.25; }
+  var x = function(i){ return pad + i*(W - pad*2)/(pts.length - 1); };
+  var y = function(v){ return pad + (1 - (v - min)/(max - min))*(H - pad*2 - 10); };
+  var line = vals.map(function(v, i){ return (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); }).join(" ");
+  var area = line + " L" + x(vals.length - 1).toFixed(1) + " " + (H - 10) + " L" + x(0).toFixed(1) + " " + (H - 10) + " Z";
+  var last = vals.length - 1;
+  return '<svg class="spark" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img" aria-label="Weight trend">' +
+    '<line x1="' + pad + '" y1="' + (H - 10) + '" x2="' + (W - pad) + '" y2="' + (H - 10) + '" stroke="var(--line)" stroke-width="1"/>' +
+    '<path d="' + area + '" fill="var(--brand)" fill-opacity=".12" stroke="none"/>' +
+    '<path d="' + line + '" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>' +
+    '<circle cx="' + x(last) + '" cy="' + y(vals[last]) + '" r="4" fill="var(--brand)" stroke="var(--surface)" stroke-width="2"/>' +
+    '</svg><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--faint)" class="num"><span>' + fmtDate(pts[0].d) + '</span><span>' + fmtDate(pts[last].d) + '</span></div>';
+}
+function renderPfWeight(){
+  var box = $("pfWeight"); if(!box) return;
+  var u = state.units.weight, w = state.body.weightKg, log = state.weightLog || [];
+  var first = log.length ? log[0].kg : null;
+  var change = (w && first != null && log.length > 1) ? kgTo(u, w - first) : null;
+  box.innerHTML =
+    '<div class="weight-now">' + (w ? '<b class="num">' + fmtWeight(w, u).replace(" " + u, "") + '</b><span>' + u + (change != null ? ' · ' + (change >= 0 ? "+" : "−") + Math.abs(Math.round(change*10)/10) + ' ' + u + ' since ' + fmtDate(log[0].d) : "") + '</span>' : '<span>Not set yet</span>') + '</div>' +
+    sparkSVG(log, u) +
+    '<div class="log-row"><div class="input-unit"><input class="input" id="pfLogW" type="number" inputmode="decimal" step="0.1" placeholder="Today’s weight" aria-label="Today’s weight in ' + u + '"><span class="u">' + u + '</span></div><button type="button" class="btn btn-primary" id="pfLogBtn" style="padding:10px 16px">Log</button></div>' +
+    (log.length ? '<div class="hist">' + log.slice(-4).reverse().map(function(e){ return '<div><span>' + fmtDate(e.d) + '</span><span>' + fmtWeight(e.kg, u) + '</span></div>'; }).join("") + '</div>' : "");
+}
+function logWeightEntry(kg){
+  var d = todayISO();
+  state.weightLog = (state.weightLog || []).filter(function(e){ return e.d !== d; });
+  state.weightLog.push({ d:d, kg:Math.round(kg*10)/10 });
+  state.weightLog.sort(function(a, b){ return a.d < b.d ? -1 : 1; });
+  state.weightLog = state.weightLog.slice(-60);
+  state.body.weightKg = Math.round(kg*10)/10;
+}
+function pfChanged(opts){
+  save();
+  opts = opts || {};
+  if(opts.targets !== false) renderPfTargets();
+  if(opts.weight) renderPfWeight();
+  var sub = $("pfSub"); if(sub) sub.textContent = GOALS[state.goal].t + " · " + DIETS[state.diet].t;
+  renderAvatar(); renderGreeting(); renderTarget(); renderKitchen();
+  if(gen.status === "idle") renderResults();
+}
+$("drawer").addEventListener("click", function(e){
+  var b = e.target.closest("button"); if(!b) return;
+  if(b.id === "pfClose"){ closeProfile(); return; }
+  if(b.id === "pfLogBtn"){
+    var inp = $("pfLogW"), v = parseFloat(inp.value);
+    if(!(v > 0)){ inp.focus(); return; }
+    var kg = toKg(state.units.weight, v);
+    if(kg < 30 || kg > 300){ inp.focus(); return; }
+    var before = dailyTargets().training.kcal;
+    logWeightEntry(kg); pfChanged({ weight:true });
+    var after = dailyTargets().training.kcal, diff = Math.round(after - before);
+    toast("Weight logged" + (state.targetMode === "auto" && hasBody() && diff ? " · targets " + (diff > 0 ? "+" : "−") + Math.abs(diff) + " kcal" : ""));
+    return;
+  }
+  if(b.id === "pfReset"){
+    if(!resetArmed){
+      resetArmed = true; b.classList.add("armed"); b.textContent = "Tap again to erase everything";
+      clearTimeout(resetTimer); resetTimer = setTimeout(function(){ resetArmed = false; var rb = $("pfReset"); if(rb){ rb.classList.remove("armed"); rb.textContent = "Start over"; } }, 4000);
+      return;
+    }
+    resetArmed = false;
+    try{ localStorage.removeItem(KEY); localStorage.removeItem(OLD_KEY); }catch(err){}
+    state = freshState(); gen = { status:"idle", dishes:[], error:"", ctl:null, target:null, summary:[] };
+    closeProfile(); startOnboarding(); return;
+  }
+  var pf = b.getAttribute("data-pf"), v = b.getAttribute("data-v");
+  if(pf){
+    if(pf === "sex"){ state.body.sex = v; setPressed(b.parentElement, "data-v", v); pfChanged(); return; }
+    if(pf === "goal"){ state.goal = v; setPressed(b.parentElement, "data-v", v); $("pfPaceRow").hidden = !(v === "lose" || v === "gain"); pfChanged(); return; }
+    if(pf === "pace"){ state.pace = v; setPressed(b.parentElement, "data-v", v); pfChanged(); return; }
+    if(pf === "diet"){ state.diet = v; setPressed(b.parentElement, "data-v", v); pfChanged({ targets:false }); return; }
+    if(pf === "mode"){ state.targetMode = v; pfChanged(); var mb = $("pfTargets").querySelector('[data-pf="mode"][data-v="' + v + '"]'); if(mb) mb.focus(); return; }
+    if(pf === "wunit" || pf === "hunit"){
+      state.units[pf === "wunit" ? "weight" : "height"] = v; save(); renderProfile(); renderTarget();
+      var ub = $("drawer").querySelector('[data-pf="' + pf + '"][data-v="' + v + '"]'); if(ub) ub.focus(); return;
+    }
+  }
+  var av = b.getAttribute("data-pfavoid");
+  if(av){
+    state.avoid = state.avoid || [];
+    var i = state.avoid.indexOf(av); if(i === -1) state.avoid.push(av); else state.avoid.splice(i, 1);
+    b.setAttribute("aria-pressed", i === -1 ? "true" : "false"); pfChanged({ targets:false }); return;
+  }
+  var st = b.getAttribute("data-pfstep");
+  if(st){
+    var p = st.split(":"), d = +p[1];
+    if(p[0] === "wd"){ state.workoutDays = Math.max(0, Math.min(7, state.workoutDays + d)); $("pfWd").textContent = state.workoutDays; pfChanged(); }
+    if(p[0] === "meals"){ state.mealsPerDay = Math.max(1, Math.min(8, state.mealsPerDay + d)); $("pfMeals").textContent = state.mealsPerDay; pfChanged({ targets:false }); }
+  }
+});
+$("drawer").addEventListener("change", function(e){
+  var t = e.target;
+  if(t.id === "pfName"){ state.name = t.value.trim(); $("pfAvatar").textContent = (state.name || "?").charAt(0).toUpperCase(); pfChanged({ targets:false }); return; }
+  if(t.id === "pfAge"){ var a = +t.value; if(a >= 14 && a <= 100){ state.body.age = a; pfChanged(); } return; }
+  if(t.id === "pfHCm"){ var c = +t.value; if(c >= 120 && c <= 250){ state.body.heightCm = c; pfChanged(); } return; }
+  if(t.id === "pfHFt" || t.id === "pfHIn"){
+    var ft = +($("pfHFt").value), inch = +($("pfHIn").value) || 0;
+    if(ft >= 3 && ft <= 8){ state.body.heightCm = Math.round(ftInToCm(ft, inch)*10)/10; pfChanged(); } return;
+  }
+  if(t.id === "pfActivity"){ state.activity = t.value; pfChanged(); return; }
+  var mk = t.getAttribute("data-pfmk");
+  if(mk){
+    var p = mk.split(":"), m = state.custom[p[0]];
+    m[p[1]] = Math.max(0, +t.value || 0);
+    if(p[1] !== "kcal") m.kcal = m.protein*4 + m.carbs*4 + m.fat*9;
+    var kin = $("pf-" + p[0] + "-kcal"); if(kin && p[1] !== "kcal") kin.value = Math.round(m.kcal);
+    pfChanged({ targets:false }); return;
+  }
+});
+$("drawer").addEventListener("keydown", function(e){
+  if(e.key === "Enter" && e.target.id === "pfLogW"){ e.preventDefault(); $("pfLogBtn").click(); }
+  if(e.key === "Enter" && e.target.id === "pfName"){ e.target.blur(); }
+});
+$("avatarBtn").addEventListener("click", openProfile);
+$("scrim").addEventListener("click", closeProfile);
+document.addEventListener("keydown", function(e){
+  if(e.key === "Escape" && $("drawer").classList.contains("open")) closeProfile();
+  if(e.key === "Tab" && $("drawer").classList.contains("open")){
+    var f = $("drawer").querySelectorAll('button:not([disabled]), input, select, summary, [tabindex]:not([tabindex="-1"])');
+    if(!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+});
+
+/* ===================== Boot ===================== */
+load();
+if(state.onboarded) showMain(); else startOnboarding();
+})();
+</script>
+</body>
+</html>

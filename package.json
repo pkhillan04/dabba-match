@@ -1,0 +1,14 @@
+{
+  "name": "dabba-match",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cook with what you have. Hit your macros.",
+  "type": "module",
+  "scripts": {
+    "dev": "node dev-server.mjs",
+    "dev:mock": "AI_PROVIDER=mock node dev-server.mjs"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}
