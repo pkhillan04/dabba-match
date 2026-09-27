@@ -8,13 +8,17 @@
 //   AI_PROVIDER=mock       (fake dishes, costs nothing; for local testing)
 //
 // Resilience: GEMINI_MODELS is a comma-separated fallback chain. If a model is busy or out of
-// quota (429/500/503) before answering, the next model is tried straight away. If one stops
-// partway, the next model is asked only for the dishes still missing, and the page keeps
-// receiving dishes as if nothing happened. Each request logs which model(s) answered.
+// quota (429/500/503), or sends no text within 7 s, the next model is tried straight away. If one
+// stops or stalls (10 s with no text) partway, the next model is asked only for the dishes still
+// missing, and the page keeps receiving dishes as if nothing happened. Dishes whose macros are
+// just the target copied are dropped and topped up the same way. Each request logs which
+// model(s) answered.
 
 import { buildPrompt, dishCount, validatePayload } from "../lib/prompt.js";
 
-const DEFAULT_GEMINI_MODELS = "gemini-3.5-flash-lite,gemini-3.8-flash,gemini-3.6-flash,gemini-3.1-flash-lite";
+const DEFAULT_GEMINI_MODELS = "gemini-3.8-flash,gemini-3.5-flash-lite,gemini-3.6-flash,gemini-3.1-flash-lite";
+const FIRST_TEXT_MS = 7000; // a model must start answering within this (connecting included)
+const STALL_MS = 10000;     // ...and never go this long without sending more text
 const DEFAULT_ANTHROPIC_MODEL = "claude-haiku-4-5";
 const BUSY = "The AI is busy right now. Try again in a moment.";
 const PARTIAL = "The AI is busy right now and stopped partway. Try again in a moment.";
@@ -71,6 +75,19 @@ class UpstreamError extends Error {
     this.status = status;
     this.detail = detail;
   }
+}
+
+// Waits for `promise`, but gives up after `ms`: aborts the model's request and throws.
+function withTimeout(promise, ms, status, ctl) {
+  let timer;
+  const expired = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      // Reject first so the race reports the timeout, not the AbortError the abort causes.
+      reject(new UpstreamError(status, `no text for ${ms} ms`));
+      ctl.abort();
+    }, ms);
+  });
+  return Promise.race([promise, expired]).finally(() => clearTimeout(timer));
 }
 
 // Yields the text inside a provider's Server-Sent Events stream. Throws UpstreamError if the
@@ -217,10 +234,16 @@ function parseWhole(text) {
   return [];
 }
 
+// A dish whose protein, carbs and fat all equal the target was copied, not calculated.
+function copiesTarget(d, t) {
+  return Math.round(+d.protein) === t.protein && Math.round(+d.carbs) === t.carbs && Math.round(+d.fat) === t.fat;
+}
+
 // Walks the model chain, yielding finished dishes (as JSON strings) until `want` have arrived.
 // `run` records what happened for the log line and the final error message.
 async function* dishesFromChain(data, signal, run) {
   const want = dishCount(data);
+  const copies = []; // dropped copied-target dishes, used only if no model can do better
   for (const model of modelChain()) {
     const need = want - run.names.length;
     if (need <= 0) return;
@@ -233,13 +256,33 @@ async function* dishesFromChain(data, signal, run) {
     const accept = (d) => {
       const key = d.name.trim().toLowerCase();
       if (run.names.some((n) => n.toLowerCase() === key)) return null;
+      if (copiesTarget(d, data.target)) {
+        attempt.copied = (attempt.copied || 0) + 1;
+        if (!copies.some((c) => c.name.trim().toLowerCase() === key)) copies.push(d);
+        return null;
+      }
       run.names.push(d.name.trim());
       attempt.dishes++;
       return JSON.stringify(d);
     };
+    // Each model gets its own abort switch (also flipped if the visitor leaves), so a slow or
+    // stalled model is actually cancelled rather than left running in the background.
+    const ctl = new AbortController();
+    const onLeave = () => ctl.abort();
+    signal?.addEventListener("abort", onLeave);
+    const firstDeadline = Date.now() + FIRST_TEXT_MS;
+    let it = null;
     try {
-      const chunks = await openModel(model, ask, signal);
-      for await (const text of chunks) {
+      const chunks = await withTimeout(openModel(model, ask, ctl.signal), FIRST_TEXT_MS, "timeout", ctl);
+      it = chunks[Symbol.asyncIterator]();
+      for (;;) {
+        const started = attempt.firstText !== undefined;
+        const r = started
+          ? await withTimeout(it.next(), STALL_MS, "stalled", ctl)
+          : await withTimeout(it.next(), Math.max(1, firstDeadline - Date.now()), "timeout", ctl);
+        if (r.done) break;
+        const text = r.value;
+        if (!started) attempt.firstText = Date.now() - run.started;
         all += text;
         buf += text;
         const lines = buf.split("\n");
@@ -248,7 +291,7 @@ async function* dishesFromChain(data, signal, run) {
           const d = parseDish(l);
           const out = d && accept(d);
           if (out) yield out;
-          if (run.names.length >= want) return; // leaving the loop also cancels the upstream stream
+          if (run.names.length >= want) return; // `finally` below cancels the upstream stream
         }
       }
       const tail = parseDish(buf);
@@ -260,25 +303,38 @@ async function* dishesFromChain(data, signal, run) {
       }
       if (attempt.dishes < need) attempt.status = "short"; // answered but gave too few; next model fills in
     } catch (err) {
-      if (signal?.aborted || err?.name === "AbortError") throw err;
+      if (signal?.aborted) throw err;
       attempt.status = err?.status || "error";
       attempt.detail = String(err?.detail || err?.message || "").slice(0, 200);
       run.lastStatus = err?.status;
-      if (err?.status && !TRY_NEXT.has(err.status) && !attempt.dishes) {
+      if (typeof err?.status === "number" && !TRY_NEXT.has(err.status) && !attempt.dishes) {
         run.fatal = true; // e.g. 401/403: a bad key won't work on the next model either
         return;
       }
+    } finally {
+      signal?.removeEventListener("abort", onLeave);
+      ctl.abort();
+      // Don't wait: a stalled stream may never settle, and aborting above has already cut it off.
+      it?.return?.().catch(() => {});
     }
+  }
+  // Every model tried and still short: copied-target dishes beat showing nothing.
+  for (const d of copies) {
+    if (run.names.length >= want) return;
+    if (run.names.some((n) => n.toLowerCase() === d.name.trim().toLowerCase())) continue;
+    run.names.push(d.name.trim());
+    run.usedCopies = (run.usedCopies || 0) + 1;
+    yield JSON.stringify(d);
   }
 }
 
 function logRun(data, run, started) {
   const want = dishCount(data);
   const chain = run.attempts
-    .map((a) => `${a.model}:${a.status}${a.dishes ? `(${a.dishes})` : ""}`)
+    .map((a) => `${a.model}:${a.status}${a.dishes ? `(${a.dishes})` : ""}${a.copied ? `[${a.copied} copied]` : ""}${a.firstText !== undefined ? `@${a.firstText}ms` : ""}`)
     .join(" -> ");
   const answered = [...new Set(run.attempts.filter((a) => a.dishes).map((a) => a.model))].join("+") || "none";
-  const line = `[dishes] mode=${data.mode} got=${run.names.length}/${want} answered_by=${answered} chain=${chain} ms=${Date.now() - started}`;
+  const line = `[dishes] mode=${data.mode} got=${run.names.length}/${want} answered_by=${answered} chain=${chain} ms=${Date.now() - started}${run.usedCopies ? ` used_copies=${run.usedCopies}` : ""}`;
   if (run.names.length < want) {
     console.error(line, run.attempts.filter((a) => a.detail).map((a) => `${a.model}: ${a.detail}`).join(" | "));
   } else console.log(line);
@@ -307,7 +363,7 @@ export async function POST(request) {
 
   const data = v.data;
   const started = Date.now();
-  const run = { names: [], attempts: [], lastStatus: null, fatal: false };
+  const run = { names: [], attempts: [], lastStatus: null, fatal: false, started };
   const dishes = dishesFromChain(data, request.signal, run);
 
   // Wait for the first dish before replying, so if every model fails we can still send a

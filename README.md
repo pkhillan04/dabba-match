@@ -52,7 +52,7 @@ No code change needed. In Vercel (Project → Settings → Environment Variables
 | Setting | Effect |
 |---|---|
 | `AI_PROVIDER=gemini` | Default. Uses Google Gemini. Free tier has daily limits. |
-| `GEMINI_MODELS=a,b,c` | Backup chain of Gemini models, tried in order. Default `gemini-3.5-flash-lite,gemini-3.8-flash,gemini-3.6-flash,gemini-3.1-flash-lite`. If one is busy or out of free quota, the next takes over (even partway through a request). |
+| `GEMINI_MODELS=a,b,c` | Backup chain of Gemini models, tried in order. Default `gemini-3.8-flash,gemini-3.5-flash-lite,gemini-3.6-flash,gemini-3.1-flash-lite`. If one is busy, out of free quota, or slow (no answer within 7 s, or stuck for 10 s partway), the next takes over, even partway through a request. |
 | `AI_PROVIDER=anthropic` + `ANTHROPIC_API_KEY=...` | Use Claude instead (default `claude-haiku-4-5`). Paid, about half a cent per request. |
 | `AI_PROVIDER=mock` | Fake dishes, for testing. |
 
