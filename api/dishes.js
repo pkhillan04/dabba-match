@@ -234,6 +234,14 @@ function parseWhole(text) {
   return [];
 }
 
+// Keeps a short sample of reply text that couldn't be read as a dish, for the logs.
+function noteUnreadable(attempt, text) {
+  const t = text.trim();
+  if (!t || /^(```(json)?|[[\],]+)$/i.test(t)) return; // blank lines, code fences, array brackets
+  attempt.unreadable = attempt.unreadable || [];
+  if (attempt.unreadable.length < 3) attempt.unreadable.push(JSON.stringify(t.slice(0, 160)));
+}
+
 // A dish whose protein, carbs and fat all equal the target was copied, not calculated.
 function copiesTarget(d, t) {
   return Math.round(+d.protein) === t.protein && Math.round(+d.carbs) === t.carbs && Math.round(+d.fat) === t.fat;
@@ -243,7 +251,6 @@ function copiesTarget(d, t) {
 // `run` records what happened for the log line and the final error message.
 async function* dishesFromChain(data, signal, run) {
   const want = dishCount(data);
-  const copies = []; // dropped copied-target dishes, used only if no model can do better
   for (const model of modelChain()) {
     const need = want - run.names.length;
     if (need <= 0) return;
@@ -257,8 +264,7 @@ async function* dishesFromChain(data, signal, run) {
       const key = d.name.trim().toLowerCase();
       if (run.names.some((n) => n.toLowerCase() === key)) return null;
       if (copiesTarget(d, data.target)) {
-        attempt.copied = (attempt.copied || 0) + 1;
-        if (!copies.some((c) => c.name.trim().toLowerCase() === key)) copies.push(d);
+        attempt.copied = (attempt.copied || 0) + 1; // always dropped; the next model tops up
         return null;
       }
       run.names.push(d.name.trim());
@@ -289,19 +295,23 @@ async function* dishesFromChain(data, signal, run) {
         buf = lines.pop();
         for (const l of lines) {
           const d = parseDish(l);
+          if (!d) noteUnreadable(attempt, l);
           const out = d && accept(d);
           if (out) yield out;
           if (run.names.length >= want) return; // `finally` below cancels the upstream stream
         }
       }
       const tail = parseDish(buf);
-      const extra = tail ? [tail] : attempt.dishes ? [] : parseWhole(all);
-      for (const d of extra) {
+      if (!tail) noteUnreadable(attempt, buf);
+      const whole = tail || attempt.dishes ? [] : parseWhole(all);
+      if (whole.length) attempt.unreadable = undefined; // it used a different format we could still read
+      for (const d of tail ? [tail] : whole) {
         const out = accept(d);
         if (out) yield out;
         if (run.names.length >= want) return;
       }
-      if (attempt.dishes < need) attempt.status = "short"; // answered but gave too few; next model fills in
+      // Answered but gave too few (or nothing at all); the next model fills in.
+      if (attempt.dishes < need) attempt.status = all.trim() ? "short" : "empty";
     } catch (err) {
       if (signal?.aborted) throw err;
       attempt.status = err?.status || "error";
@@ -318,26 +328,22 @@ async function* dishesFromChain(data, signal, run) {
       it?.return?.().catch(() => {});
     }
   }
-  // Every model tried and still short: copied-target dishes beat showing nothing.
-  for (const d of copies) {
-    if (run.names.length >= want) return;
-    if (run.names.some((n) => n.toLowerCase() === d.name.trim().toLowerCase())) continue;
-    run.names.push(d.name.trim());
-    run.usedCopies = (run.usedCopies || 0) + 1;
-    yield JSON.stringify(d);
-  }
 }
 
 function logRun(data, run, started) {
   const want = dishCount(data);
   const chain = run.attempts
-    .map((a) => `${a.model}:${a.status}${a.dishes ? `(${a.dishes})` : ""}${a.copied ? `[${a.copied} copied]` : ""}${a.firstText !== undefined ? `@${a.firstText}ms` : ""}`)
+    .map((a) => `${a.model}:${a.status}${a.dishes ? `(${a.dishes})` : ""}${a.copied ? `[${a.copied} copied]` : ""}${a.unreadable ? `[${a.unreadable.length} unreadable]` : ""}${a.firstText !== undefined ? `@${a.firstText}ms` : ""}`)
     .join(" -> ");
   const answered = [...new Set(run.attempts.filter((a) => a.dishes).map((a) => a.model))].join("+") || "none";
-  const line = `[dishes] mode=${data.mode} got=${run.names.length}/${want} answered_by=${answered} chain=${chain} ms=${Date.now() - started}${run.usedCopies ? ` used_copies=${run.usedCopies}` : ""}`;
+  const line = `[dishes] mode=${data.mode} got=${run.names.length}/${want} answered_by=${answered} chain=${chain} ms=${Date.now() - started}`;
   if (run.names.length < want) {
     console.error(line, run.attempts.filter((a) => a.detail).map((a) => `${a.model}: ${a.detail}`).join(" | "));
   } else console.log(line);
+  // What a model actually sent when we couldn't read it (search the logs for "unreadable").
+  for (const a of run.attempts) {
+    if (a.unreadable) console.warn(`[dishes] unreadable model=${a.model} sample=${a.unreadable.join(" | ")}`);
+  }
 }
 
 export async function GET() {
