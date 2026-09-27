@@ -1481,13 +1481,19 @@ function parseAll(text){
 // POSTs a payload and calls onDish for each dish as its line arrives (up to max).
 // Resolves with "" on success or a friendly error message; rejects only if aborted.
 function streamDishes(payload, signal, max, onDish){
-  var got = 0, pending = "", full = "";
+  var got = 0, pending = "", full = "", streamError = "";
   function take(d){ if(d && got < max){ got++; onDish(d); } }
+  // The server sends {"error": "..."} on its own line if the AI stops partway.
+  function line(l){
+    var m = l.trim().match(/^\{"error":(".*")\}$/);
+    if(m){ try{ streamError = JSON.parse(m[1]); }catch(e){} return; }
+    take(tryParseLine(l));
+  }
   function eat(chunk){
     full += chunk;
     var lines = (pending + chunk).split("\n");
     pending = lines.pop();
-    lines.forEach(function(l){ take(tryParseLine(l)); });
+    lines.forEach(line);
   }
   return fetch("/api/dishes", {
     method:"POST", headers:{ "Content-Type":"application/json" },
@@ -1506,9 +1512,9 @@ function streamDishes(payload, signal, max, onDish){
       return reader.read().then(function(r){
         if(r.done){
           eat(dec.decode());
-          take(tryParseLine(pending));
-          if(!got) parseAll(full).forEach(take);
-          return got ? "" : "The suggestions came back in a format we couldn’t read. Try again.";
+          line(pending);
+          if(!got && !streamError) parseAll(full).forEach(take);
+          return got ? streamError : (streamError || "The suggestions came back in a format we couldn’t read. Try again.");
         }
         eat(dec.decode(r.value, { stream:true }));
         return pump();

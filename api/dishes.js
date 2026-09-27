@@ -11,6 +11,7 @@ import { buildPrompt, dishCount, validatePayload } from "../lib/prompt.js";
 
 const DEFAULT_GEMINI_MODEL = "gemini-3.8-flash";
 const DEFAULT_ANTHROPIC_MODEL = "claude-haiku-4-5";
+const MID_STREAM_ERROR = "The AI is busy right now and stopped partway. Try again in a moment.";
 
 // ---- Basic abuse protection -------------------------------------------------
 // Best effort: each server instance remembers recent requests per IP.
@@ -43,12 +44,22 @@ function sseToText(body, extract) {
   const dec = new TextDecoder();
   const enc = new TextEncoder();
   let buf = "";
+  let failed = false;
   const handle = (line, ctrl) => {
-    if (!line.startsWith("data:")) return false;
+    if (failed || !line.startsWith("data:")) return false;
     const data = line.slice(5).trim();
     if (!data || data === "[DONE]") return false;
     try {
-      const text = extract(JSON.parse(data));
+      const evt = JSON.parse(data);
+      // Providers can fail mid-answer (e.g. Gemini free tier "high demand" 503) after sending a 200.
+      // Tell the page on its own line so it can offer "Try again" instead of showing half a dish.
+      if (evt.error || evt.type === "error") {
+        failed = true;
+        console.error("[dishes] mid-stream error", JSON.stringify(evt.error || evt).slice(0, 300));
+        ctrl.enqueue(enc.encode("\n" + JSON.stringify({ error: MID_STREAM_ERROR }) + "\n"));
+        return true;
+      }
+      const text = extract(evt);
       if (text) {
         ctrl.enqueue(enc.encode(text));
         return true;
@@ -74,6 +85,11 @@ function sseToText(body, extract) {
         buf = lines.pop();
         let sent = false;
         for (const l of lines) sent = handle(l, ctrl) || sent;
+        if (failed) {
+          reader.cancel().catch(() => {});
+          ctrl.close();
+          return;
+        }
         if (sent) return;
       }
     },
