@@ -205,14 +205,59 @@ function openModel(model, data, signal) {
 }
 
 // One dish per line; tolerate code fences and trailing commas. Returns the object or null.
-function parseDish(line) {
+// Some models (seen from gemini-3.5-flash-lite) write a comma where the colon after a field name
+// belongs: {"name":"X","tagline","Spicy..."}. This walks the line, tracking strings, objects and
+// lists, and swaps a comma for a colon only right after a field name inside an object, so list
+// items such as "uses":["Bread","fat"] are never touched. Returns null if nothing needed fixing.
+function fixFieldCommas(line) {
+  const stack = []; // open containers: { t: "{", s: "key" | "colon" | "value" } or { t: "[" }
+  let out = "";
+  let inStr = false;
+  let esc = false;
+  let changed = false;
+  for (const c of line) {
+    const top = stack[stack.length - 1];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (c === "\\") esc = true;
+      else if (c === '"') {
+        inStr = false;
+        if (top?.t === "{" && top.s === "key") top.s = "colon"; // a field name just ended
+      }
+    } else if (c === '"') inStr = true;
+    else if (c === "{") stack.push({ t: "{", s: "key" });
+    else if (c === "[") stack.push({ t: "[" });
+    else if (c === "}" || c === "]") stack.pop();
+    else if (c === ":" && top?.t === "{") top.s = "value";
+    else if (c === "," && top?.t === "{") {
+      if (top.s === "colon") {
+        out += ":";
+        top.s = "value";
+        changed = true;
+        continue;
+      }
+      top.s = "key";
+    }
+    out += c;
+  }
+  return changed ? out : null;
+}
+function parseDish(line, onRepair) {
   line = line.trim().replace(/^```(json)?/i, "").replace(/```$/, "").replace(/,$/, "").trim();
   if (!line.startsWith("{")) return null;
+  const valid = (o) => (o && typeof o === "object" && typeof o.name === "string" && o.name.trim() ? o : null);
   try {
-    const o = JSON.parse(line);
-    return o && typeof o === "object" && typeof o.name === "string" && o.name.trim() ? o : null;
+    return valid(JSON.parse(line));
   } catch {
-    return null;
+    const fixed = fixFieldCommas(line);
+    if (!fixed) return null;
+    try {
+      const o = valid(JSON.parse(fixed));
+      if (o && onRepair) onRepair();
+      return o;
+    } catch {
+      return null;
+    }
   }
 }
 // Fallback when a model ignores the one-per-line format and sends an array or {"dishes":[...]}.
@@ -260,6 +305,7 @@ async function* dishesFromChain(data, signal, run) {
     const ask = { ...data, count: need, shown: [...data.shown, ...run.names] };
     let buf = "";
     let all = "";
+    const repaired = () => (attempt.repaired = (attempt.repaired || 0) + 1);
     const accept = (d) => {
       const key = d.name.trim().toLowerCase();
       if (run.names.some((n) => n.toLowerCase() === key)) return null;
@@ -294,14 +340,14 @@ async function* dishesFromChain(data, signal, run) {
         const lines = buf.split("\n");
         buf = lines.pop();
         for (const l of lines) {
-          const d = parseDish(l);
+          const d = parseDish(l, repaired);
           if (!d) noteUnreadable(attempt, l);
           const out = d && accept(d);
           if (out) yield out;
           if (run.names.length >= want) return; // `finally` below cancels the upstream stream
         }
       }
-      const tail = parseDish(buf);
+      const tail = parseDish(buf, repaired);
       if (!tail) noteUnreadable(attempt, buf);
       const whole = tail || attempt.dishes ? [] : parseWhole(all);
       if (whole.length) attempt.unreadable = undefined; // it used a different format we could still read
@@ -333,7 +379,7 @@ async function* dishesFromChain(data, signal, run) {
 function logRun(data, run, started) {
   const want = dishCount(data);
   const chain = run.attempts
-    .map((a) => `${a.model}:${a.status}${a.dishes ? `(${a.dishes})` : ""}${a.copied ? `[${a.copied} copied]` : ""}${a.unreadable ? `[${a.unreadable.length} unreadable]` : ""}${a.firstText !== undefined ? `@${a.firstText}ms` : ""}`)
+    .map((a) => `${a.model}:${a.status}${a.dishes ? `(${a.dishes})` : ""}${a.copied ? `[${a.copied} copied]` : ""}${a.repaired ? `[${a.repaired} repaired]` : ""}${a.unreadable ? `[${a.unreadable.length} unreadable]` : ""}${a.firstText !== undefined ? `@${a.firstText}ms` : ""}`)
     .join(" -> ");
   const answered = [...new Set(run.attempts.filter((a) => a.dishes).map((a) => a.model))].join("+") || "none";
   const line = `[dishes] mode=${data.mode} got=${run.names.length}/${want} answered_by=${answered} chain=${chain} ms=${Date.now() - started}`;
