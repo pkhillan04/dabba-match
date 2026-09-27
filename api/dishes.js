@@ -91,11 +91,14 @@ function withTimeout(promise, ms, status, ctl) {
 }
 
 // Yields the text inside a provider's Server-Sent Events stream. Throws UpstreamError if the
-// provider reports an error partway (Gemini sends these after a 200 when it gets overloaded).
-async function* sseText(body, extract) {
+// provider reports an error partway (Gemini sends these after a 200 when it gets overloaded),
+// whether as a `data:` event or as plain JSON tacked on after the events. `onEvent` sees every
+// event so callers can note things like why the model stopped.
+async function* sseText(body, extract, onEvent) {
   const reader = body.getReader();
   const dec = new TextDecoder();
   let buf = "";
+  let stray = ""; // non-event text, e.g. a trailing {"error": {...}} body
   try {
     for (;;) {
       const { done, value } = await reader.read();
@@ -103,7 +106,10 @@ async function* sseText(body, extract) {
       const lines = buf.split(/\r?\n/);
       buf = done ? "" : lines.pop();
       for (const line of lines) {
-        if (!line.startsWith("data:")) continue;
+        if (!line.startsWith("data:")) {
+          if (line.trim() && !/^(event|id|retry):|^:/.test(line)) stray += line + "\n";
+          continue;
+        }
         const data = line.slice(5).trim();
         if (!data || data === "[DONE]") continue;
         let evt;
@@ -116,17 +122,30 @@ async function* sseText(body, extract) {
           const e = evt.error || evt;
           throw new UpstreamError(Number(e.code) || 503, JSON.stringify(e));
         }
+        onEvent?.(evt);
         const text = extract(evt);
         if (text) yield text;
       }
-      if (done) return;
+      if (done) {
+        if (/"error"/.test(stray)) {
+          let code = 503;
+          try {
+            code = Number(JSON.parse(stray).error?.code) || 503;
+          } catch {
+            code = Number((stray.match(/"code"\s*:\s*(\d+)/) || [])[1]) || 503;
+          }
+          throw new UpstreamError(code, stray.replace(/\s+/g, " ").slice(0, 300));
+        }
+        return;
+      }
     }
   } finally {
     reader.cancel().catch(() => {});
   }
 }
 
-async function openGemini(model, prompt, signal) {
+// `meta` collects why the model stopped and its token use, for the logs.
+async function openGemini(model, prompt, signal, meta = {}) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new UpstreamError(500, "GEMINI_API_KEY is not set");
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`;
@@ -148,15 +167,26 @@ async function openGemini(model, prompt, signal) {
     res = await call();
   }
   if (!res.ok) throw new UpstreamError(res.status, await res.text().catch(() => ""));
-  return sseText(res.body, (evt) =>
-    (evt.candidates?.[0]?.content?.parts || [])
-      .filter((p) => !p.thought)
-      .map((p) => p.text || "")
-      .join("")
+  return sseText(
+    res.body,
+    (evt) =>
+      (evt.candidates?.[0]?.content?.parts || [])
+        .filter((p) => !p.thought)
+        .map((p) => p.text || "")
+        .join(""),
+    (evt) => {
+      const f = evt.candidates?.[0]?.finishReason;
+      if (f) meta.finish = f;
+      const u = evt.usageMetadata;
+      if (u) {
+        meta.outTokens = u.candidatesTokenCount;
+        meta.thoughtTokens = u.thoughtsTokenCount || 0;
+      }
+    }
   );
 }
 
-async function openAnthropic(model, prompt, signal) {
+async function openAnthropic(model, prompt, signal, meta = {}) {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new UpstreamError(500, "ANTHROPIC_API_KEY is not set");
   const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -166,8 +196,13 @@ async function openAnthropic(model, prompt, signal) {
     signal,
   });
   if (!res.ok) throw new UpstreamError(res.status, await res.text().catch(() => ""));
-  return sseText(res.body, (evt) =>
-    evt.type === "content_block_delta" && evt.delta?.type === "text_delta" ? evt.delta.text : ""
+  return sseText(
+    res.body,
+    (evt) => (evt.type === "content_block_delta" && evt.delta?.type === "text_delta" ? evt.delta.text : ""),
+    (evt) => {
+      if (evt.delta?.stop_reason) meta.finish = evt.delta.stop_reason;
+      if (evt.usage?.output_tokens) meta.outTokens = evt.usage.output_tokens;
+    }
   );
 }
 
@@ -197,11 +232,11 @@ async function* streamMock(data) {
   }
 }
 
-function openModel(model, data, signal) {
+function openModel(model, data, signal, meta) {
   const p = provider();
   if (p === "mock") return streamMock(data);
-  if (p === "anthropic") return openAnthropic(model, buildPrompt(data), signal);
-  return openGemini(model, buildPrompt(data), signal);
+  if (p === "anthropic") return openAnthropic(model, buildPrompt(data), signal, meta);
+  return openGemini(model, buildPrompt(data), signal, meta);
 }
 
 // One dish per line; tolerate code fences and trailing commas. Returns the object or null.
@@ -325,7 +360,7 @@ async function* dishesFromChain(data, signal, run) {
     const firstDeadline = Date.now() + FIRST_TEXT_MS;
     let it = null;
     try {
-      const chunks = await withTimeout(openModel(model, ask, ctl.signal), FIRST_TEXT_MS, "timeout", ctl);
+      const chunks = await withTimeout(openModel(model, ask, ctl.signal, attempt), FIRST_TEXT_MS, "timeout", ctl);
       it = chunks[Symbol.asyncIterator]();
       for (;;) {
         const started = attempt.firstText !== undefined;
@@ -348,7 +383,9 @@ async function* dishesFromChain(data, signal, run) {
         }
       }
       const tail = parseDish(buf, repaired);
-      if (!tail) noteUnreadable(attempt, buf);
+      // A last line that starts like a dish but never finished was cut off, not badly formatted.
+      if (!tail && buf.trim().startsWith("{")) attempt.cutoff = JSON.stringify(buf.trim().slice(0, 120));
+      else if (!tail) noteUnreadable(attempt, buf);
       const whole = tail || attempt.dishes ? [] : parseWhole(all);
       if (whole.length) attempt.unreadable = undefined; // it used a different format we could still read
       for (const d of tail ? [tail] : whole) {
@@ -379,7 +416,7 @@ async function* dishesFromChain(data, signal, run) {
 function logRun(data, run, started) {
   const want = dishCount(data);
   const chain = run.attempts
-    .map((a) => `${a.model}:${a.status}${a.dishes ? `(${a.dishes})` : ""}${a.copied ? `[${a.copied} copied]` : ""}${a.repaired ? `[${a.repaired} repaired]` : ""}${a.unreadable ? `[${a.unreadable.length} unreadable]` : ""}${a.firstText !== undefined ? `@${a.firstText}ms` : ""}`)
+    .map((a) => `${a.model}:${a.status}${a.dishes ? `(${a.dishes})` : ""}${a.copied ? `[${a.copied} copied]` : ""}${a.repaired ? `[${a.repaired} repaired]` : ""}${a.cutoff ? "[cut off]" : ""}${a.unreadable ? `[${a.unreadable.length} unreadable]` : ""}${a.finish ? `{${a.finish}}` : a.cutoff || a.status === "short" || a.status === "empty" ? "{no finish}" : ""}${a.firstText !== undefined ? `@${a.firstText}ms` : ""}`)
     .join(" -> ");
   const answered = [...new Set(run.attempts.filter((a) => a.dishes).map((a) => a.model))].join("+") || "none";
   const line = `[dishes] mode=${data.mode} got=${run.names.length}/${want} answered_by=${answered} chain=${chain} ms=${Date.now() - started}`;
@@ -389,6 +426,9 @@ function logRun(data, run, started) {
   // What a model actually sent when we couldn't read it (search the logs for "unreadable").
   for (const a of run.attempts) {
     if (a.unreadable) console.warn(`[dishes] unreadable model=${a.model} sample=${a.unreadable.join(" | ")}`);
+    if (a.cutoff) {
+      console.warn(`[dishes] cut-off model=${a.model} finish=${a.finish || "none"} out_tokens=${a.outTokens ?? "?"} thought_tokens=${a.thoughtTokens ?? "?"} sample=${a.cutoff}`);
+    }
   }
 }
 
