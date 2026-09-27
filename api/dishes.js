@@ -1,4 +1,5 @@
-// POST /api/dishes  ->  streams 3 dish suggestions, one JSON object per line.
+// POST /api/dishes  ->  streams 3 dish suggestions, one JSON object per line
+//                      (2 ideas when mode is "gap": the Today tab's "Close my gap").
 // GET  /api/dishes  ->  health check (shows which AI provider is active).
 //
 // Switch AI model with environment variables only, no code change:
@@ -6,7 +7,7 @@
 //   AI_PROVIDER=anthropic  (Claude)              needs ANTHROPIC_API_KEY, optional ANTHROPIC_MODEL
 //   AI_PROVIDER=mock       (fake dishes, costs nothing; for local testing)
 
-import { buildPrompt, validatePayload } from "../lib/prompt.js";
+import { buildPrompt, dishCount, validatePayload } from "../lib/prompt.js";
 
 const DEFAULT_GEMINI_MODEL = "gemini-3.8-flash";
 const DEFAULT_ANTHROPIC_MODEL = "claude-haiku-4-5";
@@ -146,8 +147,9 @@ function streamMock(data) {
   const k = data.kitchen;
   const pick = (i) => k[i % k.length];
   const t = data.target;
-  const dishes = [0, 1, 2].map((i) => ({
-    name: `${pick(i)} ${["masala bowl", "stir-fry", "wrap"][i]}`,
+  const names = data.mode === "gap" ? ["snack cup", "quick plate"] : ["masala bowl", "stir-fry", "wrap"];
+  const dishes = names.slice(0, dishCount(data)).map((kind, i) => ({
+    name: `${pick(i)} ${kind}`,
     tagline: "Mock dish for testing. Set AI_PROVIDER to gemini for real ones.",
     minutes: [20, 15, 25][i],
     protein: Math.round(t.protein * [1, 0.92, 1.08][i]),
