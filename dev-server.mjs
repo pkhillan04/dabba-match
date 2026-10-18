@@ -21,14 +21,17 @@ if (existsSync(envFile)) {
   }
 }
 
-const api = await import("./api/dishes.js");
+const APIS = {};
+for (const name of ["dishes", "recipe", "scan", "food"]) APIS[name] = await import(`./api/${name}.js`);
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon", ".json": "application/json" };
 
 http
   .createServer(async (req, res) => {
     try {
       const url = new URL(req.url, `http://localhost:${PORT}`);
-      if (url.pathname === "/api/dishes") {
+      const apiName = (url.pathname.match(/^\/api\/([a-z]+)$/) || [])[1];
+      if (apiName && APIS[apiName]) {
+        const api = APIS[apiName];
         const chunks = [];
         for await (const c of req) chunks.push(c);
         const ctl = new AbortController();

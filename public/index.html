@@ -291,6 +291,7 @@ svg.i{ width:18px; height:18px; flex:none; stroke:currentColor; fill:none; strok
 .res-tags{ display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
 .tag{ font-size:12px; font-weight:600; padding:4px 9px; border-radius:999px; background:var(--surface-3); color:var(--ink-2); display:inline-flex; align-items:center; gap:5px; }
 .tag svg.i{ width:13px; height:13px; }
+.tag.over{ background:var(--saffron-soft); color:var(--ink); }
 .status-line{ display:flex; align-items:center; gap:10px; font-size:14px; color:var(--muted); }
 .spinner{ width:16px; height:16px; border-radius:50%; border:2px solid var(--line-2); border-top-color:var(--brand); animation:spin .8s linear infinite; }
 @keyframes spin{ to{ transform:rotate(360deg); } }
@@ -330,13 +331,40 @@ svg.i{ width:18px; height:18px; flex:none; stroke:currentColor; fill:none; strok
 .dish-actions .btn{ padding:10px 14px; font-size:14px; border-radius:12px; }
 .btn-cooked[aria-pressed="true"]{ background:var(--brand); color:var(--brand-ink); border-color:var(--brand); }
 .recipe{ padding:4px 18px 18px; display:none; }
-.recipe.open{ display:block; animation:rise .25s ease both; }
+.recipe.open{ display:block; }
+.recipe.open.anim{ animation:rise .25s ease both; }
 .recipe ol{ list-style:none; margin:0; padding:0; counter-reset:step; display:grid; gap:10px; }
-.recipe li{ counter-increment:step; display:grid; grid-template-columns:28px 1fr; gap:10px; font-size:14.5px; line-height:1.5; color:var(--ink-2); }
-.recipe li::before{
+.recipe ol li{ counter-increment:step; display:grid; grid-template-columns:28px 1fr; gap:10px; font-size:14.5px; line-height:1.5; color:var(--ink-2); }
+.recipe ol li::before{
   content:counter(step); width:26px; height:26px; border-radius:50%; background:var(--surface-3); color:var(--ink);
   font-weight:700; font-size:12px; display:grid; place-items:center; font-family:var(--font-display);
 }
+/* Recipe: servings, macros, ingredient checklist */
+.rx-head{ display:flex; flex-wrap:wrap; gap:12px 18px; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--surface-2); border-radius:12px; }
+.rx-serv{ display:flex; align-items:center; gap:10px; }
+.stepper.sm button{ width:36px; height:36px; }
+.stepper.sm .val{ min-width:30px; font-size:15px; }
+.rx-macros{ display:flex; gap:18px; }
+.rx-macros > div{ display:grid; gap:1px; font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.rx-macros b{ font-family:var(--font-display); font-size:16px; color:var(--ink); font-weight:750; }
+.rx-times{ font-size:13px; color:var(--muted); margin-top:10px; font-variant-numeric:tabular-nums; }
+.rx-times b{ color:var(--ink-2); }
+.rx-sec{ display:block; margin:16px 0 8px; }
+.checklist{ list-style:none; margin:0; padding:0; display:grid; }
+.checklist label{ display:grid; grid-template-columns:20px minmax(64px, auto) 1fr; gap:10px; align-items:baseline; padding:8px 2px; border-bottom:1px dashed var(--line); cursor:pointer; font-size:14.5px; }
+.checklist li:last-child label{ border-bottom:none; }
+.checklist input{ width:18px; height:18px; margin:0; accent-color:var(--brand); align-self:center; }
+.checklist .q{ font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; white-space:nowrap; }
+.checklist .nm{ color:var(--ink-2); overflow-wrap:anywhere; }
+.checklist .nm small{ display:block; color:var(--muted); font-size:12px; }
+.checklist input:checked ~ span{ text-decoration:line-through; color:var(--faint); }
+.checklist input:checked ~ span small{ color:var(--faint); }
+.recipe ol li .iref{ font-weight:700; color:var(--ink); }
+.basis-note{ font-size:12px; color:var(--muted); margin-top:12px; }
+details.how.per100{ margin-top:10px; }
+details.how.per100 .how-row span:last-child{ font-weight:500; color:var(--ink-2); }
+.pref-sub{ margin-top:10px; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.pref-sub .help{ font-size:12px; color:var(--muted); }
 .example-badge{ font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--saffron); background:var(--saffron-soft); padding:3px 8px; border-radius:6px; display:inline-block; margin-bottom:8px; }
 
 .skel{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px; display:grid; gap:12px; }
@@ -404,6 +432,9 @@ svg.i{ width:18px; height:18px; flex:none; stroke:currentColor; fill:none; strok
 .stepper .val{ min-width:44px; text-align:center; font-weight:700; font-variant-numeric:tabular-nums; font-size:16px; }
 .welcome-mark{ width:72px; height:72px; margin-bottom:20px; }
 .ob-note{ font-size:12.5px; color:var(--muted); background:var(--surface-2); border-radius:12px; padding:12px 14px; }
+.warn-item{ display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+.warn-row{ display:flex; gap:8px; flex-wrap:wrap; }
+.warn-btn{ border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:6px 12px; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
 .ob-warn{ font-size:13px; color:var(--ink); background:var(--saffron-soft); border-radius:12px; padding:12px 14px; }
 
 /* Result */
@@ -562,6 +593,148 @@ details.how[open] summary svg.i{ transform:rotate(180deg); }
   .bar-row{ grid-template-columns:54px 1fr 70px; }
   .big-kcal{ font-size:40px; }
 }
+
+/* ---------- Sheets (popups): scan, recipe, food log, cook mode ---------- */
+.sheet-scrim{ position:fixed; inset:0; background:rgba(8,14,11,.5); z-index:60; opacity:0; pointer-events:none; transition:opacity .2s; }
+.sheet-scrim.open{ opacity:1; pointer-events:auto; }
+.sheet{
+  position:fixed; z-index:61; background:var(--bg); color:var(--ink); box-shadow:var(--shadow-lg);
+  left:50%; top:50%; width:min(560px, calc(100% - 24px)); max-height:min(88vh, 760px);
+  display:none; flex-direction:column; border-radius:20px; overflow:hidden;
+  transform:translate(-50%, -46%); opacity:0; transition:transform .22s cubic-bezier(.2,.8,.2,1), opacity .18s;
+}
+.sheet.open{ display:flex; transform:translate(-50%, -50%); opacity:1; }
+.sheet.full{ width:min(680px, calc(100% - 24px)); max-height:min(94vh, 860px); }
+@media (max-width: 640px){
+  .sheet, .sheet.full{ left:0; right:0; bottom:0; top:auto; width:100%; max-height:92vh; border-radius:20px 20px 0 0; transform:translateY(8%); padding-bottom:env(safe-area-inset-bottom, 0px); }
+  .sheet.open{ transform:none; }
+  .sheet.full{ top:0; max-height:none; border-radius:0; height:100dvh; }
+}
+body.sheet-open{ overflow:hidden; }
+.sheet-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:18px 18px 12px; border-bottom:1px solid var(--line); background:var(--surface); }
+.sheet-head h2{ font-family:var(--font-display); font-size:20px; font-weight:800; line-height:1.2; }
+.sheet-head p{ color:var(--muted); font-size:13.5px; margin-top:3px; }
+.sheet-body{ padding:16px 18px; overflow:auto; flex:1; }
+.sheet-body .recipe{ padding:0; display:block; }
+.sheet-foot{ display:flex; gap:8px; flex-wrap:wrap; padding:12px 18px 16px; border-top:1px solid var(--line); background:var(--surface); }
+.sheet-foot .btn{ flex:1; min-width:140px; }
+.sheet-note{ font-size:12.5px; color:var(--muted); margin-top:12px; }
+.sheet-center{ display:grid; justify-items:center; gap:12px; padding:34px 18px; text-align:center; color:var(--muted); }
+.sheet-center b{ color:var(--ink); font-family:var(--font-display); font-size:17px; }
+.sheet-center .spinner{ width:26px; height:26px; border-width:3px; }
+.scan-list{ display:grid; gap:6px; margin:4px 0 0; }
+.scan-row{ display:grid; grid-template-columns:20px 1fr auto; gap:10px; align-items:center; padding:10px 12px; background:var(--surface); border:1px solid var(--line); border-radius:12px; cursor:pointer; font-size:14.5px; }
+.scan-row input{ width:18px; height:18px; margin:0; accent-color:var(--brand); }
+.scan-row small{ color:var(--muted); font-size:12px; }
+.scan-row.dim{ opacity:.55; cursor:default; }
+.qr-row{ display:flex; gap:8px; }
+.qr-row .input{ flex:1; min-width:0; }
+.qr-row .btn{ padding:11px 16px; white-space:nowrap; }
+.quick-card{ padding:14px 16px; display:grid; gap:10px; }
+.quick-card .card-title{ font-size:15px; }
+.row-actions{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.row-actions .textlink{ display:inline-flex; align-items:center; gap:6px; }
+.row-actions svg.i, .head-actions svg.i{ width:15px; height:15px; }
+.head-actions{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:flex-end; }
+.head-actions .textlink{ white-space:nowrap; }
+.head-actions .textlink{ display:inline-flex; align-items:center; gap:5px; }
+.food-row{ display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:10px; align-items:center; padding:10px 12px; background:var(--surface-2); border-radius:10px; font-size:14px; }
+.food-row .n{ font-weight:600; overflow-wrap:anywhere; }
+.food-row .n small{ display:block; font-weight:400; color:var(--muted); font-size:12.5px; }
+.food-row .k{ font-variant-numeric:tabular-nums; font-weight:600; }
+.food-row button{ border:none; background:none; cursor:pointer; color:var(--faint); padding:4px; display:grid; place-items:center; border-radius:50%; }
+.food-row button:hover{ color:var(--ink); background:var(--surface-3); }
+.food-row button svg.i{ width:14px; height:14px; }
+.food-list{ display:grid; gap:6px; margin:12px 0; }
+.food-total{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding:12px 14px; background:var(--brand-soft); border-radius:12px; font-variant-numeric:tabular-nums; }
+.food-total b{ font-family:var(--font-display); font-size:22px; }
+.food-total span{ font-size:13px; color:var(--ink-2); }
+.food-tools{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:12px; font-size:13.5px; }
+.manual-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:10px; }
+.manual-grid label.mini{ display:grid; gap:4px; font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); }
+.warn-soft{ background:var(--saffron-soft); border-radius:12px; padding:10px 12px; font-size:13px; margin-top:10px; }
+.chip.small{ padding:6px 11px; font-size:13px; }
+.style-row{ padding:14px 18px 18px; display:grid; gap:8px; }
+
+svg.i.flip{ transform:scaleX(-1); }
+/* Cook mode */
+.cook-head{ display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--surface); border-bottom:1px solid var(--line); }
+.cook-title{ flex:1; min-width:0; display:grid; }
+.cook-title b{ font-family:var(--font-display); font-size:17px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cook-title span{ font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.cook-prog{ height:4px; background:var(--surface-3); }
+.cook-prog span{ display:block; height:100%; background:var(--brand); transition:width .3s; }
+.cook-timers{ display:flex; gap:8px; flex-wrap:wrap; padding:0 16px; }
+.cook-timers:not(:empty){ padding-top:10px; }
+.timer{ display:inline-flex; align-items:center; gap:8px; padding:6px 8px 6px 12px; border-radius:999px; background:var(--saffron-soft); font-size:13.5px; font-weight:700; font-variant-numeric:tabular-nums; }
+.timer small{ font-weight:600; color:var(--ink-2); }
+.timer.done{ background:var(--brand); color:var(--brand-ink); animation:ring .6s ease-in-out 6; }
+.timer.done small{ color:var(--brand-ink); }
+.timer button{ border:none; background:rgba(0,0,0,.08); width:22px; height:22px; border-radius:50%; cursor:pointer; display:grid; place-items:center; color:inherit; }
+.timer button svg.i{ width:12px; height:12px; }
+@keyframes ring{ 0%,100%{ transform:rotate(0) } 25%{ transform:rotate(-3deg) } 75%{ transform:rotate(3deg) } }
+.cook-body{ flex:1; overflow:auto; padding:14px 18px 8px; display:grid; align-content:start; gap:14px; touch-action:pan-y; }
+.cook-stage{ background:linear-gradient(180deg, var(--brand-soft), var(--surface-2)); border-radius:18px; padding:8px; display:grid; place-items:center; }
+.cook-stage svg.scene{ width:min(300px, 100%); height:auto; max-height:200px; }
+.cook-text{ font-family:var(--font-display); font-size:clamp(21px, 4.6vw, 27px); font-weight:700; line-height:1.3; letter-spacing:-.01em; }
+.cook-text .iref{ color:var(--brand); }
+.cook-uses{ display:flex; flex-wrap:wrap; gap:6px; }
+.cook-uses .ing{ font-size:13px; padding:5px 10px; }
+.cook-act{ display:flex; gap:8px; flex-wrap:wrap; }
+.cook-nav{ display:flex; gap:10px; padding:12px 16px calc(14px + env(safe-area-inset-bottom, 0px)); border-top:1px solid var(--line); background:var(--surface); }
+.cook-nav .btn{ flex:1; padding:15px 18px; font-size:16px; }
+.cook-nav .btn.back{ flex:0 0 auto; }
+.cook-ready h3{ font-family:var(--font-display); font-size:22px; font-weight:800; }
+.cook-done{ display:grid; justify-items:center; text-align:center; gap:10px; padding:10px 0; }
+.cook-done h3{ font-family:var(--font-display); font-size:24px; font-weight:800; }
+.cook-done p{ color:var(--muted); }
+
+/* Animated scenes (inline SVG; colours come from the theme) */
+.scene{ overflow:visible; }
+.scene .ink{ fill:var(--ink-2); }
+.scene .line{ stroke:var(--ink-2); fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+.scene .board{ fill:#C99A62; }
+.scene .metal{ fill:var(--ink-2); }
+.scene .steel{ fill:#AEB9B2; }
+.scene .oil{ fill:var(--saffron); opacity:.55; }
+.scene .water{ fill:#7FB8D9; opacity:.75; }
+.scene .red{ fill:var(--protein); }
+.scene .gold{ fill:var(--saffron); }
+.scene .green{ fill:var(--brand); }
+.scene .cream{ fill:#F3E7CF; }
+.scene .brown{ fill:#8A5A33; }
+.scene .plate{ fill:var(--surface); stroke:var(--line-2); stroke-width:3; }
+.scene .fl{ fill:#F26A21; transform-box:fill-box; transform-origin:50% 100%; animation:sc-flame .7s ease-in-out infinite; }
+.scene .fl.b{ fill:#F9A826; animation-delay:.2s; }
+.scene .fl.c{ fill:#F26A21; animation-delay:.4s; }
+.scene .seed{ transform-box:fill-box; transform-origin:center; animation:sc-hop .8s ease-in infinite; }
+.scene .spoon{ transform-origin:120px 70px; animation:sc-spoon 1.4s ease-in-out infinite; }
+.scene .swirl{ transform-origin:120px 112px; animation:sc-spin 1.6s linear infinite; }
+.scene .bub{ transform-box:fill-box; transform-origin:center; animation:sc-bubble 1.6s ease-in infinite; fill:#fff; opacity:0; }
+.scene .steam{ fill:none; stroke:var(--ink-2); stroke-width:3; stroke-linecap:round; opacity:0; animation:sc-steam 2s ease-out infinite; }
+.scene .knife{ transform-box:fill-box; transform-origin:100% 100%; animation:sc-chop 1s ease-in-out infinite; }
+.scene .pin{ animation:sc-roll 1.6s ease-in-out infinite; }
+.scene .spread{ transform-box:fill-box; transform-origin:center; animation:sc-spread 1.6s ease-in-out infinite; }
+.scene .tw{ transform-box:fill-box; transform-origin:center; animation:sc-twinkle 1.6s ease-in-out infinite; fill:var(--saffron); }
+.scene .jig{ transform-box:fill-box; transform-origin:50% 100%; animation:sc-jig .35s ease-in-out infinite; }
+.scene .sink{ transform-box:fill-box; transform-origin:center; animation:sc-sink 2.4s ease-in infinite; }
+.scene .hand{ transform-origin:50% 50%; animation:sc-spin 6s linear infinite; }
+.scene .slide{ animation:sc-slide 1s ease-in-out infinite; }
+@keyframes sc-flame{ 0%,100%{ transform:scaleY(1) } 50%{ transform:scaleY(.7) } }
+@keyframes sc-hop{ 0%,100%{ transform:translateY(0) rotate(0) } 45%{ transform:translateY(-22px) rotate(160deg) } }
+@keyframes sc-spoon{ 0%,100%{ transform:rotate(-26deg) } 50%{ transform:rotate(26deg) } }
+@keyframes sc-spin{ to{ transform:rotate(360deg) } }
+@keyframes sc-bubble{ 0%{ transform:translateY(0) scale(.5); opacity:0 } 25%{ opacity:.9 } 100%{ transform:translateY(-34px) scale(1.15); opacity:0 } }
+@keyframes sc-steam{ 0%{ transform:translateY(8px); opacity:0 } 30%{ opacity:.55 } 100%{ transform:translateY(-22px); opacity:0 } }
+@keyframes sc-chop{ 0%,100%{ transform:translateY(-34px) rotate(-10deg) } 42%,58%{ transform:translateY(0) rotate(0) } }
+@keyframes sc-roll{ 0%,100%{ transform:translateX(-30px) } 50%{ transform:translateX(30px) } }
+@keyframes sc-spread{ 0%,100%{ transform:scale(.72,.9) } 50%{ transform:scale(1.08,1) } }
+@keyframes sc-twinkle{ 0%,100%{ opacity:.15; transform:scale(.5) } 50%{ opacity:1; transform:scale(1.1) } }
+@keyframes sc-jig{ 0%,100%{ transform:rotate(-5deg) } 50%{ transform:rotate(5deg) } }
+@keyframes sc-sink{ 0%{ transform:translateY(-14px); opacity:0 } 30%{ opacity:1 } 100%{ transform:translateY(10px); opacity:1 } }
+@keyframes sc-slide{ 0%,100%{ transform:translateX(0) } 50%{ transform:translateX(7px) } }
+@media (prefers-reduced-motion: reduce){ .scene *, .timer.done{ animation:none !important; } .scene .bub, .scene .steam{ opacity:.5; } }
+
 @media (prefers-reduced-motion: reduce){
   *, *::before, *::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
 }
@@ -587,6 +760,8 @@ details.how[open] summary svg.i{ transform:rotate(180deg); }
     <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1.8 2 5.2 2 7 0M9 9.5h.01M15 9.5h.01"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4z"/><path d="M5 16a4 4 0 0 1 4-4h10"/></symbol>
     <symbol id="i-scale" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 11a4.5 4.5 0 0 1 8 0"/><path d="M12 11l1.6-2.2"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8.5h3l1.6-2.5h6.8L17 8.5h3V19H4z"/><circle cx="12" cy="13.5" r="3.6"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8.5 5.5v13l10.5-6.5z"/></symbol>
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
   </defs>
 </svg>
@@ -638,6 +813,17 @@ details.how[open] summary svg.i{ transform:rotate(180deg); }
         </div>
       </div>
 
+      <div class="card quick-card" id="quickRecipe">
+        <div>
+          <div class="card-title">Know what you want to cook?</div>
+          <p class="gap-sub" style="margin:2px 0 0">Type the dish and get just the recipe. No macro matching.</p>
+        </div>
+        <div class="qr-row">
+          <input class="input" id="qrInput" type="text" maxlength="60" autocomplete="off" placeholder="e.g. paneer butter masala" aria-label="Dish name">
+          <button type="button" class="btn btn-primary" id="qrBtn">Get recipe</button>
+        </div>
+      </div>
+
       <div class="card target-card">
         <div class="target-top">
           <div>
@@ -657,6 +843,10 @@ details.how[open] summary svg.i{ transform:rotate(180deg); }
             <button type="button" class="chip" data-focus="light">Light bite</button>
           </div>
         </div>
+        <div class="style-row">
+          <span class="eyebrow" id="styleLabel">Options for your goal</span>
+          <div class="chips" id="styleChips" role="group" aria-label="Meal style for your goal"></div>
+        </div>
       </div>
 
       <div class="card">
@@ -665,7 +855,10 @@ details.how[open] summary svg.i{ transform:rotate(180deg); }
             <div class="card-title">In your kitchen</div>
             <div class="eyebrow" id="kitchenCount" style="margin-top:2px">0 items</div>
           </div>
-          <button type="button" class="textlink" id="clearKitchen" hidden>Clear all</button>
+          <div class="head-actions">
+            <button type="button" class="textlink" id="scanBtn"><svg class="i"><use href="#i-camera"/></svg>Add from photo</button>
+            <button type="button" class="textlink" id="clearKitchen" hidden>Clear all</button>
+          </div>
         </div>
         <div class="search">
           <svg class="i"><use href="#i-search"/></svg>
@@ -675,6 +868,8 @@ details.how[open] summary svg.i{ transform:rotate(180deg); }
         <div class="selected-box" id="selectedBox"></div>
         <div class="cat-tabs" role="tablist" id="catTabs"></div>
         <div class="chips" id="stapleChips"></div>
+        <p class="basis-note">Nutrition is per 100 g, weighed before cooking: dals, rice, beans, soya chunks and flours dry; meat, fish, eggs and veg raw. Recipes use the same weights.</p>
+        <details class="how per100" id="per100"><summary>Nutrition per 100 g <svg class="i"><use href="#i-down"/></svg></summary><div class="how-body" id="per100Body"></div></details>
       </div>
 
       <div class="card">
@@ -682,9 +877,13 @@ details.how[open] summary svg.i{ transform:rotate(180deg); }
           <span class="eyebrow"><svg class="i"><use href="#i-clock"/></svg>Cooking time</span>
           <div class="chips" id="timeChips" role="group" aria-label="Cooking time">
             <button type="button" class="chip" data-time="any">Any</button>
-            <button type="button" class="chip" data-time="15">15 min</button>
-            <button type="button" class="chip" data-time="30">30 min</button>
-            <button type="button" class="chip" data-time="45">45 min</button>
+            <button type="button" class="chip" data-time="quick">Quick · ≤ 20 min</button>
+            <button type="button" class="chip" data-time="medium">Medium · ≤ 40 min</button>
+            <button type="button" class="chip" data-time="long">Long · 40–90 min</button>
+          </div>
+          <div class="pref-sub">
+            <button type="button" class="chip sel-green" id="preppedChip" aria-pressed="false">Protein already cooked</button>
+            <span class="help">Meal-prepped chicken, dal or chana? Only reheating counts.</span>
           </div>
         </div>
         <div class="pref-block">
@@ -753,6 +952,24 @@ details.how[open] summary svg.i{ transform:rotate(180deg); }
         <div class="daily-line num" id="tdNote"></div>
       </div>
 
+      <div class="card" id="logCard">
+        <div class="card-head" style="margin-bottom:8px">
+          <div>
+            <div class="card-title">Log what you ate</div>
+            <div class="eyebrow" style="margin-top:2px">Type it or snap it</div>
+          </div>
+        </div>
+        <div class="qr-row">
+          <input class="input" id="foodInput" type="text" maxlength="120" autocomplete="off" placeholder="e.g. 2 roti, dal, 1 katori curd" aria-label="What did you eat?">
+          <button type="button" class="btn btn-primary" id="foodBtn">Log</button>
+        </div>
+        <div class="row-actions" style="margin-top:10px">
+          <button type="button" class="textlink" id="foodPhotoBtn"><svg class="i"><use href="#i-camera"/></svg>Photo of your plate</button>
+          <span class="empty-note">Estimates are rough. You can edit them before logging.</span>
+        </div>
+        <div class="chips" id="foodRecent" style="margin-top:10px"></div>
+      </div>
+
       <div class="card">
         <div class="card-head">
           <div>
@@ -791,6 +1008,8 @@ details.how[open] summary svg.i{ transform:rotate(180deg); }
 
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="pfName" aria-hidden="true"></aside>
+<div class="sheet-scrim" id="sheetScrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -800,16 +1019,17 @@ details.how[open] summary svg.i{ transform:rotate(180deg); }
 /* =====================================================================
    Macro engine
    Mifflin-St Jeor BMR x activity factor, goal-rate adjustment (7,700 kcal/kg),
-   protein by g/kg of a reference weight (capped at BMI 27.5), fat 27% kcal
-   with a 0.6 g/kg floor, carbs as remainder; training days sit ~12% above
-   rest days while the weekly average stays on target.
+   protein by g/kg of a reference weight (capped at BMI 27.5), fat 25% kcal
+   with a 0.7 g/kg floor, carbs as remainder; training days sit ~12% above
+   rest days while the weekly average stays on target. Lean bulk is a % of
+   maintenance (+5 / +7.5 / +10%, never more); fat loss is 10-25% below.
    ===================================================================== */
 var ACTIVITY = {
-  sedentary:{ f:1.2,   t:"Mostly sitting", d:"Desk job, little walking" },
-  light:    { f:1.375, t:"Lightly active", d:"Some walking, light exercise 1-3 days" },
-  moderate: { f:1.55,  t:"Moderately active", d:"Exercise 3-5 days a week" },
-  very:     { f:1.725, t:"Very active", d:"Hard training 6-7 days a week" },
-  extra:    { f:1.9,   t:"Athlete / physical job", d:"Twice-a-day training or manual work" }
+  sedentary:{ f:1.2,   t:"Mostly sitting", d:"Desk job, no regular workouts" },
+  light:    { f:1.375, t:"Desk job + workouts", d:"Sitting most of the day, 1-5 workouts a week (most gym-goers)" },
+  moderate: { f:1.55,  t:"On your feet + workouts", d:"Active job or busy days (teacher, retail), plus 3-5 workouts" },
+  very:     { f:1.725, t:"Very active", d:"Physical job plus regular training, or 6-7 hard sessions a week" },
+  extra:    { f:1.9,   t:"Athlete / manual labour", d:"Heavy manual work all day, or twice-a-day training" }
 };
 var GOALS = {
   lose:    { t:"Lose fat", d:"Drop fat while keeping muscle" },
@@ -819,7 +1039,7 @@ var GOALS = {
 };
 var PACES = {
   lose: { gentle:{t:"Gentle", r:0.005}, standard:{t:"Steady", r:0.0075}, fast:{t:"Faster", r:0.01} },
-  gain: { gentle:{t:"Gentle", r:0.0025}, standard:{t:"Steady", r:0.0035}, fast:{t:"Faster", r:0.005} }
+  gain: { gentle:{t:"Gentle", pct:0.05}, standard:{t:"Steady", pct:0.075}, fast:{t:"Faster", pct:0.10} }
 };
 var PROTEIN_PER_KG = { lose:2.2, recomp:2.0, maintain:1.8, gain:2.0 };
 
@@ -830,11 +1050,12 @@ function calcTargets(p){
   var tdee = bmr * (ACTIVITY[p.activity] ? ACTIVITY[p.activity].f : 1.55);
   var adj = 0, rate = 0;
   if(p.goal === "lose"){
-    rate = PACES.lose[p.pace || "standard"].r;
-    adj = Math.max(-(w*rate*7700/7), -0.25*tdee);
+    rate = (PACES.lose[p.pace] || PACES.lose.standard).r;
+    adj = -Math.min(Math.max(w*rate*7700/7, 0.10*tdee), 0.25*tdee);
   } else if(p.goal === "gain"){
-    rate = PACES.gain[p.pace || "standard"].r;
-    adj = Math.min(w*rate*7700/7, 0.15*tdee);
+    var gp = (PACES.gain[p.pace] || PACES.gain.standard).pct;
+    adj = Math.min(gp, 0.10)*tdee;
+    rate = adj*7/7700/w;
   } else if(p.goal === "recomp"){
     adj = -0.05*tdee;
   }
@@ -844,7 +1065,7 @@ function calcTargets(p){
   var refWeight = Math.min(w, 27.5*hm*hm);
   var ppk = PROTEIN_PER_KG[p.goal] || 1.8;
   var protein = ppk*refWeight;
-  var fat = Math.max(avg*0.27/9, 0.6*refWeight);
+  var fat = Math.max(avg*0.25/9, 0.7*refWeight);
   var carbs = (avg - protein*4 - fat*9)/4;
   if(carbs < 50){
     var minFat = 0.5*refWeight, need = (50-carbs)*4, canTrim = Math.max(0, (fat-minFat)*9);
@@ -861,8 +1082,46 @@ function calcTargets(p){
     rest = { protein:protein, carbs:carbs - drop/4, fat:fat };
   } else { training = base; rest = base; }
   function r(o){ var P=Math.round(o.protein), C=Math.round(o.carbs), F=Math.round(o.fat); return { kcal:P*4+C*4+F*9, protein:P, carbs:C, fat:F }; }
-  return { weight:w, bmi:bmi, bmr:bmr, tdee:tdee, adj:adj, rate:rate, avg:avg, floored:floored, proteinPerKg:ppk,
+  return { weight:w, bmi:bmi, bmr:bmr, tdee:tdee, factor:(ACTIVITY[p.activity] ? ACTIVITY[p.activity].f : 1.55), adj:adj, adjPct:(tdee ? adj/tdee : 0), rate:rate, avg:avg, floored:floored, proteinPerKg:ppk,
            refWeight:refWeight, workoutDays:n, training:r(training), rest:r(rest), average:r(base) };
+}
+
+/* Input sanity checks. Never blocking: each can be dismissed, and the pounds
+   one offers a one-tap fix. */
+function inputWarnings(b, goal){
+  var out = [], w = +b.weightKg, h = +b.heightCm, a = +b.age;
+  if(h >= 100 && w > 0){
+    var bmi = w/((h/100)*(h/100)), asLb = (w/2.20462)/((h/100)*(h/100));
+    if(bmi > 40 || bmi < 16){
+      var canFix = asLb >= 16 && asLb <= 40;
+      out.push({ id:"bmi", text:"We have you at " + (Math.round(w*10)/10) + " kg, which is a BMI of " + Math.round(bmi) + (canFix ? ". Did you enter pounds?" : ". Please double-check your weight."), fix:canFix });
+    } else if(goal === "gain" && bmi >= 27.5){
+      out.push({ id:"bulkbmi", text:"At a BMI of " + Math.round(bmi*10)/10 + " a lean bulk is usually not the best first step. Recomposition may suit you better." });
+    }
+  }
+  if(h && (h < 140 || h > 210)) out.push({ id:"height", text:"Your height looks unusual (" + Math.round(h) + " cm). Please double-check it." });
+  if(a && a < 16) out.push({ id:"age", text:"These targets are made for adults. Under 16, check with a doctor or dietitian first." });
+  return out;
+}
+function warnHTML(list, dismissed){
+  dismissed = dismissed || {};
+  return list.filter(function(x){ return !dismissed[x.id]; }).map(function(x){
+    return '<div class="ob-warn warn-item"><span>' + esc(x.text) + '</span><span class="warn-row">' +
+      (x.fix ? '<button type="button" class="warn-btn" data-warn="lb">Convert from lb</button>' : '') +
+      '<button type="button" class="warn-btn" data-warn="dismiss:' + x.id + '">Dismiss</button></span></div>';
+  }).join("");
+}
+function warnAction(a, scope){
+  var o = scope === "ob" ? ob : state;
+  o.dismissed = o.dismissed || {};
+  if(a.indexOf("dismiss:") === 0){ o.dismissed[a.slice(8)] = true; }
+  else if(a === "lb"){
+    var cur = +o.weightKg || +(o.body && o.body.weightKg) || 0;
+    if(scope === "ob"){ o.weightKg = cur/2.20462; o.units.weight = "lb"; }
+    else { o.body.weightKg = cur/2.20462; o.units.weight = "lb"; }
+  }
+  if(scope === "ob"){ renderOb(); }
+  else { save(); renderProfile(); renderTarget(); pfChanged(); }
 }
 
 /* ===================== Units ===================== */
@@ -875,7 +1134,14 @@ function fmtWeight(kg, u){ return (Math.round(kgTo(u, kg)*10)/10).toFixed(1).rep
 function fmtHeight(cm, u){ if(u === "ftin"){ var f = cmToFtIn(cm); return f.ft + "′" + f.inch + "″"; } return Math.round(cm) + " cm"; }
 function fmt(n){ return Math.round(n).toLocaleString("en-US"); }
 
-/* ===================== Staples ===================== */
+/* ===================== Staples =====================
+   Each item: [name, diet tag, kcal, protein g, carbs g, fat g, basis, source], all per 100 g.
+   Basis is how you weigh it before cooking, and recipes use the same convention:
+     "dry"  = uncooked dry weight (dals, rice, beans, soya chunks, oats, poha, flours)
+     "raw"  = raw weight (meat, fish, eggs, vegetables, fruit)
+     "sold" = as it comes from the pack or shop (paneer, curd, bread, sauces, oils)
+   Source: "U" + id = USDA FoodData Central (SR Legacy) record; "L" = Indian pack label;
+   "I" = IFCT 2017 (Indian Food Composition Tables), as quoted in published summaries. */
 var CATS = [
   { id:"protein", t:"Protein" },
   { id:"carbs", t:"Carbs" },
@@ -883,13 +1149,147 @@ var CATS = [
   { id:"veg", t:"Veg & fruit" },
   { id:"pantry", t:"Pantry" }
 ];
+var BASIS_LABEL = { dry:"dry, uncooked", raw:"raw", sold:"as sold" };
 var STAPLES = {
-  protein:[["Eggs","egg"],["Chicken breast","meat"],["Chicken thighs","meat"],["Mutton","redmeat"],["Fish","fish"],["Prawns","fish"],["Paneer","dairy"],["Greek yogurt","dairy"],["Curd (dahi)","dairy"],["Whey protein","dairy"],["Tofu",""],["Soy chunks",""],["Moong dal",""],["Toor dal",""],["Masoor dal",""],["Chana",""],["Rajma",""],["Peanuts","nut"]],
-  carbs:[["Rice",""],["Roti / atta","gluten"],["Oats",""],["Bread","gluten"],["Poha",""],["Suji / rava","gluten"],["Besan",""],["Potato",""],["Sweet potato",""],["Pasta","gluten"],["Wraps / tortilla","gluten"],["Quinoa",""]],
-  fats:[["Milk","dairy"],["Butter / ghee","dairy"],["Cheese","dairy"],["Cream cheese","dairy"],["Almonds","nut"],["Peanut butter","nut"],["Olive oil",""],["Coconut",""]],
-  veg:[["Onion",""],["Tomato",""],["Spinach",""],["Capsicum",""],["Mixed veggies",""],["Peas",""],["Carrot",""],["Cucumber",""],["Mushroom",""],["Cauliflower",""],["Banana",""],["Apple",""],["Berries",""]],
-  pantry:[["Garlic",""],["Ginger",""],["Green chilli",""],["Lemon",""],["Basic masala",""],["Coriander",""],["Honey",""],["Soy sauce","gluten"],["Chilli flakes",""]]
+  protein:[
+    ["Eggs","egg",143,12.6,0.7,9.5,"raw","U171287"],
+    ["Egg whites","egg",52,10.9,0.7,0.2,"raw","U172183"],
+    ["Chicken breast","meat",120,22.5,0,2.6,"raw","U171077"],
+    ["Chicken thighs","meat",121,19.7,0,4.1,"raw","U173627"],
+    ["Chicken curry cut","meat",119,21.4,0,3.1,"raw","U171052"],      // meat only; bone not counted
+    ["Chicken keema","meat",143,17.4,0,8.1,"raw","U171116"],
+    ["Mutton","redmeat",109,20.6,0,2.3,"raw","U175303"],              // goat
+    ["Fish","fish",96,20.1,0,1.7,"raw","U175176"],                    // white fish (tilapia ≈ rohu, basa)
+    ["Prawns","fish",85,20.1,0,0.5,"raw","U175179"],
+    ["Tuna (canned)","fish",86,19.4,0,1,"sold","U173709"],            // in water, drained
+    ["Paneer","dairy",323,20,4.5,25,"sold","L"],                      // Amul malai paneer
+    ["Greek yogurt","dairy",59,10.2,3.6,0.4,"sold","U170894"],
+    ["Curd (dahi)","dairy",61,3.5,4.7,3.3,"sold","U171284"],
+    ["Whey protein","dairy",390,78,8,6,"sold","L"],                   // typical label, ~24 g protein per 30 g scoop
+    ["Tofu","",144,17.3,2.8,8.7,"sold","U172475"],
+    ["Soya chunks","",345,52,33,0.5,"dry","L"],                       // Nutrela
+    ["Soya chaap","gluten",271,20.2,34.8,7.3,"sold","L"],             // Harman; soy + maida, varies by brand
+    ["Moong dal","",347,23.9,62.6,1.2,"dry","U174256"],
+    ["Toor dal","",343,21.7,62.8,1.5,"dry","U172436"],
+    ["Masoor dal","",352,24.6,63.4,1.1,"dry","U172420"],
+    ["Chana dal","",378,20.5,63,6,"dry","U173756"],                   // USDA "bengal gram"
+    ["Urad dal","",341,25.2,59,1.6,"dry","U174259"],
+    ["Chole (kabuli chana)","",378,20.5,63,6,"dry","U173756"],
+    ["Kala chana","",378,20.5,63,6,"dry","U173756"],
+    ["Rajma","",333,23.6,60,0.8,"dry","U175193"],
+    ["Lobia","",336,23.5,60,1.3,"dry","U173758"],
+    ["Moong sprouts","",30,3,5.9,0.2,"raw","U169957"],
+    ["Sattu","",374,22,58,6,"dry","I"],                               // roasted chana flour
+    ["Peanuts","nut",567,25.8,16.1,49.2,"raw","U172430"]
+  ],
+  carbs:[
+    ["Rice","",365,7.1,80,0.7,"dry","U168877"],
+    ["Brown rice","",367,7.5,76.3,3.2,"dry","U169703"],
+    ["Roti / atta","gluten",340,13.2,72,2.5,"dry","U168893"],         // whole-wheat flour
+    ["Maida","gluten",364,10.3,76.3,1,"dry","U168894"],
+    ["Besan","",387,22.4,57.8,6.7,"dry","U174288"],
+    ["Oats","",379,13.2,67.7,6.5,"dry","U173904"],
+    ["Poha","",346,6.6,77.3,1.2,"dry","I"],
+    ["Suji / rava","gluten",360,12.7,72.8,1.1,"dry","U169715"],
+    ["Dalia","gluten",342,12.3,75.9,1.3,"dry","U170688"],             // broken wheat (USDA bulgur)
+    ["Vermicelli (seviyan)","gluten",371,13,74.7,1.5,"dry","U169736"], // same as dry pasta
+    ["Bajra","",378,11,72.9,4.2,"dry","U169702"],
+    ["Jowar","",329,10.6,72.1,3.5,"dry","U169716"],
+    ["Ragi","",321,7.2,66.8,1.9,"dry","I"],
+    ["Makhana","",347,9.7,76.9,0.1,"dry","I"],
+    ["Bread","gluten",266,8.9,49.4,3.3,"sold","U174924"],
+    ["Brown bread","gluten",252,12.5,42.7,3.5,"sold","U172688"],
+    ["Wraps / tortilla","gluten",297,8,49.3,7.6,"sold","U167535"],
+    ["Pasta","gluten",371,13,74.7,1.5,"dry","U169736"],
+    ["Quinoa","",368,14.1,64.2,6.1,"dry","U168874"],
+    ["Potato","",77,2,17.5,0.1,"raw","U170026"],
+    ["Sweet potato","",86,1.6,20.1,0.1,"raw","U168482"],
+    ["Sweet corn","",86,3.3,18.7,1.4,"raw","U169998"]
+  ],
+  fats:[
+    ["Milk","dairy",61,3.2,4.8,3.3,"sold","U171265"],                 // 3.25% fat, close to Indian toned milk (3%)
+    ["Chaas / buttermilk","dairy",40,3.3,4.8,1.1,"sold","U170874"],
+    ["Butter","dairy",717,0.9,0.1,81.1,"sold","U173410"],
+    ["Ghee","dairy",900,0,0,100,"sold","U171314"],
+    ["Fresh cream (malai)","dairy",292,2.2,3,30.9,"sold","U170858"],
+    ["Cheese","dairy",366,18.1,4.8,30.7,"sold","U170853"],            // processed slices/cubes
+    ["Mozzarella","dairy",254,24.3,2.8,15.9,"sold","U170847"],
+    ["Cream cheese","dairy",350,6.2,5.5,34.4,"sold","U173418"],
+    ["Almonds","nut",579,21.2,21.6,49.9,"raw","U170567"],
+    ["Cashews","nut",553,18.2,30.2,43.9,"raw","U170162"],
+    ["Walnuts","nut",654,15.2,13.7,65.2,"raw","U170187"],
+    ["Peanut butter","nut",598,22.2,22.3,51.4,"sold","U172470"],
+    ["Flaxseed (alsi)","",534,18.3,28.9,42.2,"raw","U169414"],
+    ["Chia seeds","",486,16.5,42.1,30.7,"raw","U170554"],
+    ["Pumpkin seeds","",559,30.2,10.7,49.1,"raw","U170556"],
+    ["Til (sesame)","",573,17.7,23.5,49.7,"raw","U170150"],
+    ["Olive oil","",884,0,0,100,"sold","U171413"],
+    ["Mustard oil","",884,0,0,100,"sold","U172337"],
+    ["Coconut","",354,3.3,15.2,33.5,"raw","U170169"]
+  ],
+  veg:[
+    ["Onion","",40,1.1,9.3,0.1,"raw","U170000"],
+    ["Tomato","",18,0.9,3.9,0.2,"raw","U170457"],
+    ["Spinach","",23,2.9,3.6,0.4,"raw","U168462"],
+    ["Methi leaves","",49,4.4,6,0.9,"raw","I"],
+    ["Sarson greens","",27,2.9,4.7,0.4,"raw","U169256"],
+    ["Capsicum","",20,0.9,4.6,0.2,"raw","U170427"],
+    ["Mixed veggies","",72,3.3,13.5,0.5,"raw","U170471"],             // frozen mix
+    ["Peas","",81,5.4,14.5,0.4,"raw","U170419"],
+    ["Carrot","",41,0.9,9.6,0.2,"raw","U170393"],
+    ["Cucumber","",15,0.7,3.6,0.1,"raw","U168409"],
+    ["Mushroom","",22,3.1,3.3,0.3,"raw","U169251"],
+    ["Cauliflower","",25,1.9,5,0.3,"raw","U169986"],
+    ["Cabbage","",25,1.3,5.8,0.1,"raw","U169975"],
+    ["Broccoli","",34,2.8,6.6,0.4,"raw","U170379"],
+    ["French beans","",31,1.8,7,0.2,"raw","U169961"],
+    ["Bhindi","",33,1.9,7.5,0.2,"raw","U169260"],
+    ["Baingan","",25,1,5.9,0.2,"raw","U169228"],
+    ["Lauki","",14,0.6,3.4,0,"raw","U169232"],
+    ["Kaddu (pumpkin)","",26,1,6.5,0.1,"raw","U168448"],
+    ["Beetroot","",43,1.6,9.6,0.2,"raw","U169145"],
+    ["Mooli","",16,0.7,3.4,0.1,"raw","U169276"],
+    ["Spring onion","",32,1.8,7.3,0.2,"raw","U170005"],
+    ["Banana","",89,1.1,22.8,0.3,"raw","U173944"],
+    ["Apple","",52,0.3,13.8,0.2,"raw","U171688"],
+    ["Berries","",32,0.7,7.7,0.3,"raw","U167762"],
+    ["Mango","",60,0.8,15,0.4,"raw","U169910"],
+    ["Papaya","",43,0.5,10.8,0.3,"raw","U169926"],
+    ["Orange","",47,0.9,11.8,0.1,"raw","U169097"],
+    ["Guava","",68,2.6,14.3,1,"raw","U173044"],
+    ["Pomegranate","",83,1.7,18.7,1.2,"raw","U169134"]
+  ],
+  pantry:[
+    ["Garlic","",149,6.4,33.1,0.5,"raw","U169230"],
+    ["Ginger","",80,1.8,17.8,0.8,"raw","U169231"],
+    ["Green chilli","",40,2,9.5,0.2,"raw","U170497"],
+    ["Lemon","",29,1.1,9.3,0.3,"raw","U167746"],
+    ["Coriander","",23,2.1,3.7,0.5,"raw","U169997"],
+    ["Pudina (mint)","",44,3.3,8.4,0.7,"raw","U173475"],
+    ["Basic masala","",325,14.3,55.8,14,"sold","U170924"],           // USDA curry powder as a blend stand-in
+    ["Haldi","",312,9.7,67.1,3.3,"sold","U172231"],
+    ["Jeera","",375,17.8,44.2,22.3,"sold","U170923"],
+    ["Red chilli powder","",318,12,56.6,17.3,"sold","U170932"],
+    ["Dhania powder","",298,12.4,55,17.8,"sold","U170922"],
+    ["Garam masala","",325,14.3,55.8,14,"sold","U170924"],           // blend stand-in
+    ["Chaat masala","",325,14.3,55.8,14,"sold","U170924"],           // blend stand-in
+    ["Rai (mustard seeds)","",508,26.1,28.1,36.2,"sold","U170929"],
+    ["Black pepper","",251,10.4,64,3.3,"sold","U170931"],
+    ["Chilli flakes","",318,12,56.6,17.3,"sold","U170932"],
+    ["Imli (tamarind)","",239,2.8,62.5,0.6,"sold","U167763"],
+    ["Tomato puree","",38,1.7,9,0.2,"sold","U170460"],
+    ["Tomato ketchup","",101,1,27.4,0.1,"sold","U168556"],
+    ["Chilli sauce","",93,1.9,19.2,0.9,"sold","U171186"],
+    ["Soy sauce","gluten",53,8.1,4.9,0.6,"sold","U174277"],
+    ["Vinegar","",21,0,0.9,0,"sold","U173469"],
+    ["Honey","",304,0.3,82.4,0,"sold","U169640"],
+    ["Jaggery (gur)","",380,0.1,98.1,0,"sold","U168833"],            // USDA brown sugar as stand-in
+    ["Sugar","",387,0,100,0,"sold","U169655"],
+    ["Dates","",282,2.5,75,0.4,"raw","U171726"]
+  ]
 };
+// Old names saved in kitchens before the list was updated -> new name(s).
+var RENAMED = { "Soy chunks":["Soya chunks"], "Chana":["Chole (kabuli chana)"], "Butter / ghee":["Butter","Ghee"] };
 var DIETS = {
   nonveg:{ t:"Non-veg", d:"Eat everything", hide:[] },
   egg:{ t:"Eggetarian", d:"Vegetarian plus eggs", hide:["meat","redmeat","fish"] },
@@ -897,6 +1297,7 @@ var DIETS = {
   vegan:{ t:"Vegan", d:"Fully plant-based", hide:["meat","redmeat","fish","egg","dairy"] }
 };
 var AVOIDS = [["Beef",""],["Pork",""],["Red meat","redmeat"],["Seafood","fish"],["Eggs","egg"],["Dairy","dairy"],["Gluten","gluten"],["Nuts","nut"]];
+var TIME_LABEL = { any:"", quick:"Quick · ≤ 20 min", medium:"Medium · ≤ 40 min", long:"Long · 40–90 min" };
 var FOCUS_LABEL = { balanced:"Balanced", protein:"High protein", carb:"High carb", light:"Light bite" };
 var MOOD_LABEL = { any:"", spicy:"Spicy", comfort:"Comfort food", street:"Street-style", fresh:"Fresh & light", sweet:"Something sweet" };
 
@@ -910,6 +1311,10 @@ function visibleStaples(cat){
   return STAPLES[cat].filter(function(s){ return !s[1] || hide.indexOf(s[1]) === -1; }).map(function(s){ return s[0]; });
 }
 function allVisibleStaples(){ var out = []; CATS.forEach(function(c){ out = out.concat(visibleStaples(c.id)); }); return out; }
+var STAPLE_INFO = {};
+CATS.forEach(function(c){ STAPLES[c.id].forEach(function(s){ STAPLE_INFO[s[0].toLowerCase()] = s; }); });
+function stapleInfo(name){ return STAPLE_INFO[String(name).toLowerCase()] || null; }
+function per100Text(s){ return fmt(s[2]) + " kcal · " + s[3] + "P " + s[4] + "C " + s[5] + "F"; }
 
 /* ===================== State ===================== */
 var KEY = "dabbamatch_v4";
@@ -922,14 +1327,16 @@ function freshState(){
     weightLog:[],
     activity:"moderate", workoutDays:4,
     goal:"maintain", pace:"standard",
-    targetMode:"auto",
+    targetMode:"auto", dismissed:{},
     custom:{ training:{kcal:2200,protein:150,carbs:230,fat:70}, rest:{kcal:1950,protein:150,carbs:170,fat:70} },
     diet:"nonveg", avoid:[], cuisine:"indian",
     mealsPerDay:4,
-    dayType:"training", focus:"balanced", time:"any", mood:"any",
+    dayType:"training", focus:"balanced", time:"any", mood:"any", style:"any",
+    prepped:false,               // protein already cooked (meal prep): only reheating counts
     kitchen:[], recentlyMade:[],
     view:"cook",                 // "cook" or "today"
     usualMeals:[],               // [{ id, name, protein, carbs, fat, kcal }], set once
+    foodHistory:[],              // [{ name, protein, carbs, fat, kcal }] recent typed/photo meals, newest first
     dayLog:{}                    // { "YYYY-MM-DD": [{ id, name, protein, carbs, fat, kcal, src:"usual"|"dish", ref }] }
   };
 }
@@ -944,6 +1351,7 @@ function load(){
     if(!Array.isArray(state.usualMeals)) state.usualMeals = [];
     if(!state.dayLog || typeof state.dayLog !== "object" || Array.isArray(state.dayLog)) state.dayLog = {};
     if(state.view !== "today") state.view = "cook";
+    migrateState(state);
     return;
   }
   // migrate v3 (manual macros) so existing users keep their targets, kitchen and history
@@ -961,8 +1369,22 @@ function load(){
     st.kitchen = Array.isArray(old.kitchen) ? old.kitchen.slice(0, 60) : [];
     st.recentlyMade = Array.isArray(old.recentlyMade) ? old.recentlyMade.slice(0, 10) : [];
     st.dayType = old.dayType === "rest" ? "rest" : "training";
+    migrateState(st);
     state = st; save();
   }
+}
+// Older saves: renamed ingredients and the old minute-based time filter.
+var OLD_TIMES = { "15":"quick", "30":"medium", "45":"medium" };
+function migrateState(st){
+  var out = [];
+  (Array.isArray(st.kitchen) ? st.kitchen : []).forEach(function(k){
+    if(typeof k !== "string") return;
+    (RENAMED[k] || [k]).forEach(function(n){ if(out.indexOf(n) === -1) out.push(n); });
+  });
+  st.kitchen = out.slice(0, 60);
+  st.time = OLD_TIMES[st.time] || (["any","quick","medium","long"].indexOf(st.time) !== -1 ? st.time : "any");
+  st.prepped = st.prepped === true;
+  if(!Array.isArray(st.recentlyMade)) st.recentlyMade = [];
 }
 function sanitizeMacro(m){ return { kcal:+m.kcal||0, protein:+m.protein||0, carbs:+m.carbs||0, fat:+m.fat||0 }; }
 function hasBody(b){ b = b || state.body; return !!(b && (b.sex === "male" || b.sex === "female") && b.age >= 14 && b.heightCm >= 120 && b.weightKg >= 30); }
@@ -1097,7 +1519,7 @@ function renderOb(){
       '</div>';
   }
   else if(step === "activity"){
-    html = '<h1>How active are you?</h1><p class="lede">Think about a typical week, workouts included.</p><div class="ob-body"><div class="options">' +
+    html = '<h1>How active are you?</h1><p class="lede">Count your job and daily movement first, then workouts. Most people who lift 3-5 days with a desk job are “Desk job + workouts”.</p><div class="ob-body"><div class="options">' +
       Object.keys(ACTIVITY).map(function(k){ return optBtn("activity", k, ACTIVITY[k].t, ACTIVITY[k].d, ob.activity === k); }).join("") +
       '</div><div class="field"><span class="lab">Workout days per week</span>' +
       '<div style="display:flex;align-items:center;gap:12px"><div class="stepper"><button type="button" data-step="wd:-1" aria-label="Fewer workout days">−</button><span class="val" id="obWd">' + ob.workoutDays + '</span><button type="button" data-step="wd:1" aria-label="More workout days">+</button></div>' +
@@ -1110,7 +1532,11 @@ function renderOb(){
       var pk = PACES[ob.goal], wkg = +ob.weightKg || 70;
       html += '<div class="field"><span class="lab">Pace</span><div class="options">' +
         Object.keys(pk).map(function(k){
-          var perWeek = wkg*pk[k].r;
+          var perWeek = wkg*(pk[k].r || 0.0025);
+          if(+ob.heightCm && +ob.age && +ob.weightKg && ob.sex){
+            var cc = calcTargets({ sex:ob.sex, age:+ob.age, heightCm:+ob.heightCm, weightKg:+ob.weightKg, activity:ob.activity, workoutDays:ob.workoutDays, goal:ob.goal, pace:k });
+            perWeek = Math.abs(cc.adj)*7/7700;
+          }
           var txt = (ob.goal === "lose" ? "About −" : "About +") + fmtWeight(perWeek, ob.units.weight) + " a week";
           return optBtn("pace", k, pk[k].t, txt, ob.pace === k);
         }).join("") + '</div></div>';
@@ -1162,6 +1588,7 @@ function renderObResult(){
     '<div class="split"><span style="width:' + (pk/tot*100) + '%;background:var(--protein)"></span><span style="width:' + (ck/tot*100) + '%;background:var(--carbs)"></span><span style="width:' + (fk/tot*100) + '%;background:var(--fat)"></span></div>' +
     '<div class="result-legend"><div><b class="num">' + a.protein + 'g</b>Protein</div><div><b class="num">' + a.carbs + 'g</b>Carbs</div><div><b class="num">' + a.fat + 'g</b>Fat</div></div></div>';
   if(c.workoutDays >= 1 && c.workoutDays <= 6) html += dayCards(c.training, c.rest);
+  html += warnHTML(inputWarnings({ heightCm:ob.heightCm, weightKg:ob.weightKg, age:ob.age }, ob.goal), ob.dismissed);
   html += howItWorks(c, ob.units);
   if(c.floored) html += '<p class="ob-warn">We kept calories at a safe minimum of ' + fmt(c.avg) + ' kcal. Going lower is best done with a doctor or dietitian.</p>';
   if(c.bmi < 18.5 && ob.goal === "lose") html += '<p class="ob-warn">Your BMI is under 18.5. Maintaining or building muscle may suit you better than losing weight.</p>';
@@ -1173,14 +1600,17 @@ function dayCards(t, r){
     '<div class="daycard"><div class="h">' + icon("moon") + 'Rest day</div><div class="k num">' + fmt(r.kcal) + ' kcal</div><div class="m">' + Math.round(r.protein) + 'P · ' + Math.round(r.carbs) + 'C · ' + Math.round(r.fat) + 'F</div></div></div>';
 }
 function howItWorks(c, units){
-  var adjTxt = c.adj === 0 ? "No change" : (c.adj > 0 ? "+" : "−") + fmt(Math.abs(c.adj)) + " kcal";
+  var pct = Math.round(Math.abs(c.adjPct)*1000)/10;
+  var adjTxt = c.adj === 0 ? "No change" : (c.adj > 0 ? "+" : "−") + fmt(Math.abs(c.adj)) + " kcal (" + pct + "%)";
+  function row(l, v, note){ return '<div class="how-row" style="flex-wrap:wrap"><span>' + l + '</span><span>' + v + '</span><small style="flex-basis:100%;color:var(--muted)">' + note + '</small></div>'; }
   return '<details class="how"><summary>How we worked this out ' + icon("down") + '</summary><div class="how-body">' +
-    '<div class="how-row"><span>Resting burn (Mifflin-St Jeor)</span><span>' + fmt(c.bmr) + ' kcal</span></div>' +
-    '<div class="how-row"><span>With your activity</span><span>' + fmt(c.tdee) + ' kcal</span></div>' +
-    '<div class="how-row"><span>Goal adjustment</span><span>' + adjTxt + '</span></div>' +
-    '<div class="how-row"><span>Protein</span><span>' + c.proteinPerKg + ' g per kg' + (c.refWeight < c.weight - 0.5 ? ' of a ' + fmtWeight(c.refWeight, units.weight) + ' reference weight' : ' of body weight') + '</span></div>' +
-    '<div class="how-row"><span>Fat</span><span>~27% of calories</span></div>' +
-    '<div class="how-row"><span>Carbs</span><span>The rest of your calories</span></div>' +
+    row("Resting burn (BMR)", fmt(c.bmr) + ' kcal', 'What your body burns at rest (Mifflin-St Jeor).') +
+    row("Maintenance", fmt(c.tdee) + ' kcal', 'Resting burn × ' + c.factor + ' for your activity. Eating this keeps your weight steady.') +
+    row("Goal adjustment", adjTxt, c.adj > 0 ? 'A small surplus for lean gain. Bigger surpluses mostly add fat.' : (c.adj < 0 ? 'A deficit sized to lose fat and keep muscle.' : 'No surplus or deficit.')) +
+    row("Daily average target", fmt(c.average.kcal) + ' kcal', 'Maintenance plus your goal adjustment.') +
+    row("Protein", c.proteinPerKg + ' g per kg', (c.refWeight < c.weight - 0.5 ? 'Based on a ' + fmtWeight(c.refWeight, units.weight) + ' reference weight.' : 'Based on your body weight.')) +
+    row("Fat", '~25% of calories', 'At least 0.7 g per kg for hormones and health.') +
+    row("Carbs", 'The rest', 'Fuel for training. Training days get a bit more, rest days a bit less.') +
     '</div></details>';
 }
 
@@ -1226,6 +1656,7 @@ function finishOnboarding(){
 $("obView").addEventListener("click", function(e){
   var t = e.target.closest("button"); if(!t) return;
   obReadInputs();
+  var wa = t.getAttribute("data-warn"); if(wa){ warnAction(wa, "ob"); return; }
   if(t.id === "obBack"){ if(obIndex > 0){ obIndex--; renderOb(); } return; }
   if(t.id === "obNext"){
     var steps = obSteps();
@@ -1272,7 +1703,7 @@ function showMain(){
 }
 function renderAll(){
   renderAvatar(); renderGreeting(); renderDay(); renderTarget(); renderFocus();
-  renderKitchen(); renderPrefs(); renderCTA(); renderResults(); renderRecent(); renderView();
+  renderKitchen(); renderPrefs(); renderCTA(); renderResults(); renderRecent(); renderView(); renderFoodRecent();
 }
 function renderView(){
   var today = state.view === "today";
@@ -1298,9 +1729,13 @@ function renderTarget(){
   ].map(function(m){ return '<div class="macro-line"><span class="dot" style="background:' + m[2] + '"></span><span class="k">' + m[0] + '</span><span class="v">' + Math.round(m[1]) + 'g</span></div>'; }).join("");
   $("dailyLine").textContent = (state.dayType === "rest" ? "Rest" : "Training") + " day total: " + fmt(d.kcal) + " kcal · " + Math.round(d.protein) + "P " + Math.round(d.carbs) + "C " + Math.round(d.fat) + "F" + (state.targetMode === "custom" ? " (your numbers)" : "");
   $("findMeta").textContent = "~" + fmt(t.kcal) + " kcal";
+  renderStyle();
 }
 function renderFocus(){ setPressed($("focusChips"), "data-focus", state.focus); }
-function renderPrefs(){ setPressed($("timeChips"), "data-time", state.time); setPressed($("moodChips"), "data-mood", state.mood); }
+function renderPrefs(){
+  setPressed($("timeChips"), "data-time", state.time); setPressed($("moodChips"), "data-mood", state.mood);
+  $("preppedChip").setAttribute("aria-pressed", state.prepped ? "true" : "false");
+}
 
 function renderKitchen(){
   var k = state.kitchen;
@@ -1318,7 +1753,12 @@ function renderKitchen(){
     return '<button type="button" role="tab" data-cat="' + c.id + '" aria-selected="' + (c.id === activeCat) + '">' + c.t + (n ? '<span class="count">' + n + '</span>' : "") + '</button>';
   }).join("");
   $("stapleChips").innerHTML = visibleStaples(activeCat).map(function(s){
-    return '<button type="button" class="chip sel-green" data-staple="' + esc(s) + '" aria-pressed="' + (k.indexOf(s) !== -1) + '">' + esc(s) + '</button>';
+    var info = stapleInfo(s);
+    return '<button type="button" class="chip sel-green" data-staple="' + esc(s) + '" aria-pressed="' + (k.indexOf(s) !== -1) + '" title="Per 100 g ' + esc(BASIS_LABEL[info[6]]) + ': ' + esc(per100Text(info)) + '">' + esc(s) + '</button>';
+  }).join("");
+  $("per100Body").innerHTML = visibleStaples(activeCat).map(function(s){
+    var info = stapleInfo(s);
+    return '<div class="how-row"><span>' + esc(s) + ' <small>(' + esc(BASIS_LABEL[info[6]]) + ')</small></span><span class="num">' + esc(per100Text(info)) + '</span></div>';
   }).join("");
   renderCTA();
 }
@@ -1342,7 +1782,10 @@ function renderSuggest(){
   var have = state.kitchen.map(function(s){ return s.toLowerCase(); });
   var hits = allVisibleStaples().filter(function(s){ return s.toLowerCase().indexOf(q) !== -1 && have.indexOf(s.toLowerCase()) === -1; }).slice(0, 6);
   var exact = allVisibleStaples().some(function(s){ return s.toLowerCase() === q; }) || have.indexOf(q) !== -1;
-  var html = hits.map(function(s, i){ return '<button type="button" role="option" data-add="' + esc(s) + '" class="' + (i === sugIndex ? "active" : "") + '">' + icon("plus") + esc(s) + '</button>'; }).join("");
+  var html = hits.map(function(s, i){
+    var info = stapleInfo(s);
+    return '<button type="button" role="option" data-add="' + esc(s) + '" class="' + (i === sugIndex ? "active" : "") + '">' + icon("plus") + esc(s) + '<span class="hint num">' + esc(info[6] === "sold" ? "" : info[6] + " · ") + fmt(info[2]) + ' kcal/100 g</span></button>';
+  }).join("");
   if(!exact) html += '<button type="button" role="option" data-add="' + esc($("kitchenSearch").value.trim()) + '" class="' + (sugIndex === hits.length ? "active" : "") + '">' + icon("plus") + 'Add “' + esc($("kitchenSearch").value.trim()) + '”<span class="hint">custom</span></button>';
   box.innerHTML = html; box.hidden = !html;
 }
@@ -1352,13 +1795,229 @@ function renderCTA(){
   $("findHint").hidden = !empty;
 }
 
+/* ---------- Recipes: units, scaling, fractions ----------
+   The AI gives ingredient quantities for ONE serving. The servings stepper multiplies them here,
+   on the device, so no new AI call is needed. Main ingredients scale exactly; spices, salt and
+   oil scale more gently (you don't need double the oil for double the paneer) and everything is
+   rounded to amounts you can actually measure: 5 g, 1/4 tsp, a pinch, half a lemon, whole eggs. */
+var UNIT_ALIAS = {
+  teaspoon:"tsp", teaspoons:"tsp", tsps:"tsp", tablespoon:"tbsp", tablespoons:"tbsp", tbsps:"tbsp", tbs:"tbsp",
+  cups:"cup", glasses:"glass", katoris:"katori", bowl:"katori", bowls:"katori", pinches:"pinch",
+  gm:"g", gms:"g", gram:"g", grams:"g", gr:"g", kgs:"kg", kilogram:"kg",
+  "":"pcs", piece:"pcs", pieces:"pcs", pc:"pcs", nos:"pcs", no:"pcs", number:"pcs", whole:"pcs", medium:"pcs", small:"pcs", large:"pcs",
+  inches:"inch", clove:"cloves", slice:"slices",
+  millilitre:"ml", milliliter:"ml", millilitres:"ml", milliliters:"ml", litre:"l", liter:"l", litres:"l", liters:"l", ltr:"l"
+};
+var SPOON_UNITS = { tsp:1, tbsp:1, cup:1, glass:1, katori:1 };
+var SPICE = /\b(salt|namak|haldi|turmeric|chill?i powder|mirch powder|lal mirch|jeera|cumin|masala|hing|asafoetida|ajwain|pepper|kali mirch|kasuri|rai|mustard seeds|dhania powder|coriander powder|cinnamon|dalchini|cardamom|elaichi|laung|tej patta|bay lea\w*|chill?i flakes|oregano|baking soda|amchur|kalonji|saunf|fennel|methi seeds)\b/i;
+var FAT = /\b(oil|ghee|butter)\b/i;
+var WHOLE = /\b(eggs?|anda|slices?|chill(i|ies)|mirch|rotis?|chapatis?|tortillas?|wraps?|bread|cloves?|dates?|sticks?|leaves|bay|pav|bun)\b/i;
+// Grams are shown first only for things you actually weigh. Everything else gets a kitchen unit,
+// and grams the model sent for vegetables become pieces or katori ("1/2 onion, about 50 g").
+var WEIGH = /\b(paneer|tofu|chicken|mutton|keema|fish|prawns?|tuna|rice|dal|rajma|chole|chana|lobia|oats|poha|atta|flour|maida|besan|suji|rava|soya|chaap|quinoa|pasta|dalia|vermicelli|seviyan|sattu|makhana|bajra|jowar|ragi|whey|nuts?|almonds?|peanuts?|cashews?)\b/i;
+var PIECE_G = [[/\bonions?\b/i,100],[/\btomato(es)?\b/i,100],[/\bsweet potato/i,150],[/\bpotato(es)?|\baloo\b/i,150],[/\bcapsicum|bell pepper/i,120],[/\bcarrots?\b/i,70],[/\bcucumber/i,200],[/\blemons?|\blimes?|nimbu/i,50],[/\beggs?\b/i,50],[/\bbanana/i,120],[/\bapple/i,180],[/\bgreen chill/i,5],[/\bbeetroot/i,120],[/\bbread\b/i,25]];
+var KATORI_G = [[/\b(curd|dahi|yogh?urt|hung curd)\b/i,150],[/\b(peas|matar|corn|sprouts|mixed veg\w*)\b/i,100],[/\b(spinach|palak|methi|sarson)\b/i,50],[/\b(cabbage|cauliflower|gobhi|beans|mushrooms?|broccoli|bhindi|lauki|kaddu|pumpkin)\b/i,80]];
+function lookupG(table, name){ for(var i = 0; i < table.length; i++) if(table[i][0].test(name)) return table[i][1]; return 0; }
+var STEP_AMOUNT = /\b\d+(?:[.,/]\d+)?(?:\s*(?:-|to)\s*\d+(?:[.,/]\d+)?)?\s*(?:g|gm|gms|grams?|kg|ml|l|litres?|liters?|tsp|teaspoons?|tbsp|tablespoons?|cups?|katoris?|glass(?:es)?)\b\.?\s*(?:of\s+)?/gi;
+
+function parseQty(v){
+  if(typeof v === "number") return v > 0 && isFinite(v) ? v : 0;
+  var t = String(v || "").trim(), m;
+  if((m = t.match(/^(\d+)\s+(\d+)\/(\d+)$/))) return +m[1] + m[2]/m[3];
+  if((m = t.match(/^(\d+)\/(\d+)$/))) return m[1]/m[2];
+  var n = parseFloat(t); return n > 0 ? n : 0;
+}
+// One ingredient from the AI -> { name, qty, unit, g }. Lab units become kitchen units.
+function normIng(o){
+  if(typeof o === "string") return o.trim() ? { name:o.trim().slice(0, 60), qty:0, unit:"note", g:0 } : null;
+  if(!o || typeof o !== "object" || !o.name) return null;
+  var name = String(o.name).trim().slice(0, 60), qty = parseQty(o.qty), g = parseQty(o.g);
+  var u = String(o.unit == null ? "" : o.unit).trim().toLowerCase().replace(/\.$/, "");
+  if(/taste|as needed|as required|garnish/.test(u) || (!qty && !g)) return { name:name, qty:0, unit:"taste", g:0 };
+  u = UNIT_ALIAS[u] || u;
+  if(u === "kg"){ u = "g"; qty *= 1000; }
+  if(u === "l"){ u = "ml"; qty *= 1000; }
+  if(u === "ml"){ // no ml in a home kitchen: 5 ml = 1 tsp, 15 ml = 1 tbsp, 240 ml = 1 cup
+    if(qty >= 60){ u = "cup"; qty /= 240; } else if(qty >= 15){ u = "tbsp"; qty /= 15; } else { u = "tsp"; qty /= 5; }
+  }
+  if(u === "g"){ g = qty; }
+  if(!qty && g){ u = "g"; qty = g; }
+  if(u === "g" && !WEIGH.test(name)){
+    var pg = lookupG(PIECE_G, name), kg = pg ? 0 : lookupG(KATORI_G, name);
+    if(pg) return { name:name, qty:g/pg, unit:"pcs", g:g, fromG:true };
+    if(kg) return { name:name, qty:g/kg, unit:"katori", g:g, fromG:true };
+  }
+  // Grams on spoons and pieces (oil 5 g, eggs 100 g) add nothing for a home cook.
+  if(u !== "g" && !WEIGH.test(name)) g = 0;
+  return { name:name, qty:qty, unit:u.slice(0, 16), g:g };
+}
+function kindOf(ing){
+  if(ing.unit === "taste" || ing.unit === "note") return "fixed";
+  if(/peanut butter/i.test(ing.name)) return "main";
+  if(SPICE.test(ing.name) && (ing.unit === "tsp" || ing.unit === "tbsp" || ing.unit === "pinch")) return "spice";
+  if(FAT.test(ing.name) && (ing.unit === "tsp" || ing.unit === "tbsp")) return "fat";
+  return "main";
+}
+// Nearest quarter or third (1/4, 1/3, 1/2, 2/3, 3/4 ...), never below `min`.
+function roundFrac(x, min){
+  var q = Math.round(x*4)/4, t = Math.round(x*3)/3;
+  var r = Math.abs(t - x) < Math.abs(q - x) - 0.01 ? t : q;
+  return Math.max(min, r);
+}
+// Spoons of spice or oil: 1/4 steps below one spoon, 1/2 steps above (no "1 3/4 tsp oil").
+function roundSpoon(x){ return x < 1 ? Math.max(0.25, Math.round(x*4)/4) : Math.round(x*2)/2; }
+function scaleIng(ing, servings){
+  var kind = kindOf(ing);
+  if(kind === "fixed") return { name:ing.name, qty:0, unit:ing.unit, g:0 };
+  var f = kind === "spice" ? Math.pow(servings, 0.75) : kind === "fat" ? Math.pow(servings, 0.8) : servings;
+  var qty = ing.qty*f, unit = ing.unit, g = ing.g ? ing.g*servings : 0;
+  if(unit === "g") qty = qty < 10 ? Math.max(1, Math.round(qty)) : Math.round(qty/5)*5;
+  else if(unit === "pinch") qty = Math.max(1, Math.round(qty));
+  else if(unit === "tsp" && kind === "spice" && qty < 0.2) { unit = "pinch"; qty = Math.max(1, Math.round(qty/0.0625)); }
+  else if(SPOON_UNITS[unit]) qty = kind === "main" ? roundFrac(qty, 0.25) : roundSpoon(qty);
+  else if(unit === "pcs" || unit === "cloves" || unit === "slices"){
+    // Eggs, cloves, slices, chillies, rotis: whole ones. Lemons, onions, tomatoes: halves are fine.
+    qty = WHOLE.test(ing.name) || unit !== "pcs" ? Math.max(1, Math.round(qty)) : Math.max(0.5, Math.round(qty*2)/2);
+  }
+  else qty = roundFrac(qty, 0.25);
+  if(unit === "pinch" && qty >= 4){ unit = "tsp"; qty = 0.25; }
+  // 3 tsp = 1 tbsp: switch only when it lands on a whole or half tbsp (4 tsp stays "4 tsp").
+  // Oil just rounds to the nearest 1/2 tbsp.
+  if(unit === "tsp" && qty >= 3 && kind === "fat"){ unit = "tbsp"; qty = roundSpoon(qty/3); }
+  else if(unit === "tsp" && qty >= 3 && kind === "main" && Math.abs(qty/3 - Math.round(qty/1.5)/2) < 0.1){ unit = "tbsp"; qty = Math.round(qty/1.5)/2; }
+  if(unit === "tbsp" && qty >= 4 && kind === "main"){ unit = "cup"; qty = roundFrac(qty/16, 0.25); } // 16 tbsp = 1 cup
+  if(g) g = g < 10 ? Math.max(1, Math.round(g)) : Math.round(g/5)*5;
+  return { name:ing.name, qty:qty, unit:unit, g:g, fromG:ing.fromG };
+}
+// 0.5 -> "1/2", 1.25 -> "1 1/4", 0.333 -> "1/3"
+function fmtFrac(x){
+  var whole = Math.floor(x + 1e-6), rest = x - whole, fr = "";
+  [[1,4],[1,3],[1,2],[2,3],[3,4]].forEach(function(p){ if(!fr && Math.abs(rest - p[0]/p[1]) < 0.02) fr = p[0] + "/" + p[1]; });
+  if(!fr && rest > 0.02) return String(Math.round(x*10)/10);
+  if(rest > 0.98){ whole++; fr = ""; }
+  return whole ? whole + (fr ? " " + fr : "") : (fr || "0");
+}
+var UNIT_WORD = { pinch:["pinch","pinches"], cup:["cup","cups"], glass:["glass","glasses"], katori:["katori","katori"], cloves:["clove","cloves"], slices:["slice","slices"], inch:["inch","inch"], block:["block","blocks"] };
+function unitWord(u, q){ var w = UNIT_WORD[u]; return w ? w[q > 1 ? 1 : 0] : u; }
+// Text for the quantity column: "100 g", "1/2 tsp", "2", "to taste".
+function qtyText(s){
+  if(s.unit === "taste") return "to taste";
+  if(s.unit === "note") return "";
+  if(s.unit === "g") return fmt(s.qty) + " g";
+  if(s.g && !s.fromG) return fmt(s.g) + " g";
+  return fmtFrac(s.qty) + (s.unit === "pcs" ? "" : " " + unitWord(s.unit, s.qty));
+}
+// Household hint next to grams: "about 1/2 block".
+function homeText(s){
+  if(s.fromG) return "about " + fmt(s.g) + " g";
+  return s.g && s.unit !== "g" ? "about " + fmtFrac(s.qty) + " " + (s.unit === "pcs" ? (s.qty > 1 ? "pieces" : "piece") : unitWord(s.unit, s.qty)) : "";
+}
+function inlineText(s){
+  var q = qtyText(s), n = countName(s).toLowerCase();
+  return s.unit === "taste" || s.unit === "note" ? n : q + " " + n;
+}
+// Counted items agree with their number: "3 onions", "1 1/2 lemons", "1 egg", "2 green chillies".
+// Only the main word changes (the last word before any brackets); things you don't count stay as they are.
+var UNCOUNTED = /\b(garlic|ginger|coriander|dhania|pudina|mint|paneer|tofu|rice|dal|bread|water|milk|curd|dahi|oil|ghee|butter|salt|sugar|cheese|spinach|palak|methi|chaap|soya|chicken|mutton|fish|keema|masala|powder|paste|sauce|juice|jeera|haldi|honey|jaggery|batter|dough|flour|atta|besan)\b/i;
+var ALWAYS_PLURAL = /^(peas|oats|sprouts|greens|beans|lentils|seeds|flakes|chips|noodles|chickpeas)$/i;
+var PLURAL_OF = { tomato:"tomatoes", potato:"potatoes", mango:"mangoes", chilli:"chillies", chili:"chilies", mirch:"mirch", leaf:"leaves" };
+var SINGULAR_OF = {};
+Object.keys(PLURAL_OF).forEach(function(k){ SINGULAR_OF[PLURAL_OF[k]] = k; });
+function matchCase(src, word){ return src.charAt(0) === src.charAt(0).toUpperCase() ? word.charAt(0).toUpperCase() + word.slice(1) : word; }
+function pluralWord(w){
+  var l = w.toLowerCase();
+  if(PLURAL_OF[l]) return matchCase(w, PLURAL_OF[l]);
+  if(SINGULAR_OF[l] || ALWAYS_PLURAL.test(l) || /[^s]s$/.test(l)) return w;   // already plural
+  if(/(s|x|z|ch|sh)$/.test(l)) return w + "es";
+  if(/[^aeiou]y$/.test(l)) return w.slice(0, -1) + "ies";
+  return w + "s";
+}
+function singularWord(w){
+  var l = w.toLowerCase();
+  if(SINGULAR_OF[l]) return matchCase(w, SINGULAR_OF[l]);
+  if(ALWAYS_PLURAL.test(l) || /ss$/.test(l) || !/s$/.test(l)) return w;
+  if(/[^aeiou]ies$/.test(l)) return w.slice(0, -3) + "y";
+  if(/(x|z|ch|sh)es$/.test(l)) return w.slice(0, -2);
+  return w.slice(0, -1);
+}
+function countName(s){
+  if(s.unit !== "pcs" || UNCOUNTED.test(s.name)) return s.name;
+  var m = s.name.match(/^(.*?)([A-Za-z]+)(\s*(?:\(.*)?)$/);
+  if(!m) return s.name;
+  return m[1] + (s.qty > 1 ? pluralWord(m[2]) : singularWord(m[2])) + m[3];
+}
+// Steps refer to ingredients as {n} (or by name in braces), so their amounts follow the stepper.
+// Any amount the model still wrote into a step is removed: the checklist has the right one.
+// A step with two sentences becomes two steps: one action per line.
+function splitSteps(steps){
+  var out = [];
+  steps.forEach(function(st){
+    String(st).replace(/\s+/g, " ").trim().replace(/([.!?])\s+(?=[A-Z{])/g, "$1\n").split("\n").forEach(function(x){ x = x.trim(); if(x) out.push(x); });
+  });
+  return out.slice(0, 14);
+}
+// The first step that uses an ingredient gives its amount; later steps just say "the onions".
+function stepHTML(step, scaled, said){
+  var parts = String(step).replace(STEP_AMOUNT, "").split(/(\{[^{}]{1,60}\})/);
+  return parts.map(function(p){
+    var m = p.match(/^\{([^{}]+)\}$/);
+    if(!m) return esc(p);
+    var key = m[1].trim(), ing = null;
+    if(/^\d+$/.test(key)) ing = scaled[+key - 1] || null;
+    else scaled.forEach(function(s){ if(!ing && s.name.toLowerCase().indexOf(key.toLowerCase()) === 0) ing = s; });
+    if(!ing) return esc(key);
+    if(said.indexOf(ing) !== -1 || ing.unit === "taste" || ing.unit === "note") return esc(countName(ing).toLowerCase());
+    said.push(ing);
+    return '<span class="iref">' + esc(inlineText(ing)) + '</span>';
+  }).join("");
+}
+var servingsFor = {}, checkedIng = {}, justOpened = null; // justOpened: only that recipe animates in
+function servingsOf(key, ctx){ return servingsFor[key] || (ctx === "gap" ? 1 : 2); }
+function macroLine(P, C, F){ return fmt(P) + "P · " + fmt(C) + "C · " + fmt(F) + "F"; }
+function minText(m){ return m >= 60 ? Math.floor(m/60) + " h" + (m % 60 ? " " + (m % 60) + " min" : "") : m + " min"; }
+function recipeHTML(d, key, ctx){
+  var n = servingsOf(key, ctx), html = "";
+  if(d.ingredients.length){
+    html += '<div class="rx-head"><div class="rx-serv"><span class="eyebrow">Servings</span><div class="stepper sm">' +
+      '<button type="button" data-serv="-1" data-key="' + esc(key) + '" aria-label="Fewer servings"' + (n <= 1 ? " disabled" : "") + '>−</button>' +
+      '<span class="val" aria-live="polite">' + n + '</span>' +
+      '<button type="button" data-serv="1" data-key="' + esc(key) + '" aria-label="More servings"' + (n >= 8 ? " disabled" : "") + '>+</button></div></div>' +
+      '<div class="rx-macros"><div><span class="eyebrow">Per serving</span><b>' + fmt(d.kcal) + ' kcal</b><span>' + macroLine(d.protein, d.carbs, d.fat) + '</span></div>' +
+      (n > 1 ? '<div><span class="eyebrow">Total for ' + n + '</span><b>' + fmt(d.kcal*n) + ' kcal</b><span>' + macroLine(d.protein*n, d.carbs*n, d.fat*n) + '</span></div>' : "") +
+      '</div></div>';
+  }
+  if(d.total) html += '<p class="rx-times">Prep <b>' + minText(d.prepMin) + '</b> · Cook <b>' + minText(d.cookMin) + '</b> · Total <b>' + minText(d.total) + '</b>' +
+    (d.soakHours ? ' · Soak <b>' + d.soakHours + ' h</b> ahead (not in total)' : "") + '</p>';
+  var scaled = d.ingredients.map(function(i){ return scaleIng(i, n); });
+  if(scaled.length){
+    html += '<span class="eyebrow rx-sec">Ingredients</span><ul class="checklist">' + scaled.map(function(s, i){
+      var ck = key + "#" + i, home = homeText(s);
+      return '<li><label><input type="checkbox" data-check="' + esc(ck) + '"' + (checkedIng[ck] ? " checked" : "") + '>' +
+        '<span class="q">' + esc(qtyText(s)) + '</span><span class="nm">' + esc(countName(s)) + (home ? '<small>' + esc(home) + '</small>' : "") + '</span></label></li>';
+    }).join("") + '</ul><span class="eyebrow rx-sec">Steps</span>';
+  }
+  var said = [];
+  html += '<ol>' + d.steps.map(function(st){ return '<li><span>' + stepHTML(st, scaled, said) + '</span></li>'; }).join("") + '</ol>';
+  return html;
+}
+
 /* ---------- Results ---------- */
-var EXAMPLE_BASE = { name:"Soy chunk & chana masala bowl", tagline:"Smoky tomato masala over rice, high protein without meat.", minutes:25,
-  uses:["Soy chunks","Chana","Onion","Tomato","Rice"], extra:["Coriander"],
-  steps:["Soak soy chunks in hot salted water for 10 minutes, then squeeze dry.","Sauté onion in 1 tsp oil until golden; add ginger-garlic and masala.","Add chopped tomato and cook down to a thick masala.","Stir in soy chunks and chana with a splash of water; simmer 8 minutes.","Serve over rice and finish with lemon and coriander."] };
+var EXAMPLE_BASE = { name:"Soya chunk & chole masala bowl", tagline:"Smoky tomato masala over rice, high protein without meat.",
+  prepMin:15, cookMin:25, soakHours:0,
+  uses:["Soya chunks","Chole (kabuli chana)","Onion","Tomato","Rice"], extra:["Coriander"],
+  ingredients:[
+    { name:"Soya chunks", qty:0.5, unit:"katori", g:30 }, { name:"Rice", qty:0.33, unit:"katori", g:50 },
+    { name:"Water", qty:1, unit:"glass" }, { name:"Oil", qty:1, unit:"tsp" }, { name:"Jeera", qty:0.5, unit:"tsp" },
+    { name:"Onion", qty:1, unit:"pcs" }, { name:"Ginger-garlic paste", qty:1, unit:"tsp" }, { name:"Tomato", qty:1, unit:"pcs" },
+    { name:"Basic masala", qty:1, unit:"tsp" }, { name:"Boiled chole", qty:0.5, unit:"katori", g:80 },
+    { name:"Salt", qty:0, unit:"taste" }, { name:"Lemon", qty:0.5, unit:"pcs" }
+  ],
+  steps:["Soak {1} in hot salted water for 10 minutes.","Squeeze {1} dry.","Cook {2} with {3} until soft.","Heat {4} in a kadai.","Add {5} and let it crackle.",
+    "Add chopped {6}. Fry until golden.","Add {7}. Cook 1 minute.","Add chopped {8} and {9}.","Cook until the masala turns thick.",
+    "Add {1}, {10} and {11}.","Simmer 8 minutes on low flame.","Serve over the rice with {12} squeezed on top."] };
 // The example is sized to the viewer's own meal target so it shows what a good fit looks like.
 function exampleDish(t){
-  var d = Object.assign({}, EXAMPLE_BASE);
+  var d = normDish(EXAMPLE_BASE);
   d.protein = Math.round(t.protein*0.96); d.carbs = Math.round(t.carbs*1.05); d.fat = Math.round(t.fat*0.92);
   d.kcal = d.protein*4 + d.carbs*4 + d.fat*9;
   return d;
@@ -1374,19 +2033,23 @@ function barRow(label, v, goal, color, unit){
   var max = Math.max(v, goal)*1.15 || 1;
   return '<div class="bar-row"><span class="k">' + label + '</span><div class="track"><span class="fill" style="width:' + (v/max*100) + '%;background:' + color + '"></span><span class="goal" style="left:' + (goal/max*100) + '%" title="Target"></span></div><span class="v"><b>' + fmt(v) + '</b> / ' + fmt(goal) + unit + '</span></div>';
 }
-function dishHTML(d, idx, t, isExample, isNew){
+function dishHTML(d, idx, t, isExample, isNew, ctx){
   var score = matchScore(d, t), cls = score >= 88 ? "" : score >= 72 ? " mid" : " low";
   var lab = score >= 88 ? "Great fit" : score >= 72 ? "Good fit" : "Loose fit";
   function bar(k, label, color){ return barRow(label, d[k], t[k], color, "g"); }
   var cooked = state.recentlyMade.some(function(r){ return r.name === d.name; });
   var open = !!openRecipe[(isExample ? "ex:" : "") + d.name];
+  var rkey = (isExample ? "ex:" : ctx === "gap" ? "gap:" : "") + d.name;
   return '<article class="dish' + (isNew ? ' enter' : '') + '">' +
     '<div class="dish-top"><div>' + (isExample ? '<span class="example-badge">Example</span>' : "") +
       '<h3>' + esc(d.name) + '</h3>' + (d.tagline ? '<p class="tagline">' + esc(d.tagline) + '</p>' : "") + '</div>' +
       '<div class="match' + cls + '"><div class="pct num">' + score + '%</div><div class="lab">' + lab + '</div></div></div>' +
     '<div class="dish-meta">' +
-      '<span class="tag">' + icon("flame") + '<span class="num">' + fmt(d.kcal) + ' kcal</span></span>' +
-      (d.minutes ? '<span class="tag">' + icon("clock") + '<span class="num">' + Math.round(d.minutes) + ' min</span></span>' : "") +
+      '<span class="tag">' + icon("flame") + '<span class="num">' + fmt(d.kcal) + ' kcal / serving</span></span>' +
+      (d.total ? '<span class="tag">' + icon("clock") + '<span class="num">' + minText(d.total) + ' total</span></span>' +
+        '<span class="tag num">' + d.prepMin + ' prep · ' + d.cookMin + ' cook</span>' : "") +
+      (d.soakHours ? '<span class="tag num">Soak ' + d.soakHours + ' h ahead</span>' : "") +
+      (d.overTime ? '<span class="tag over">Over your time limit</span>' : "") +
     '</div>' +
     '<div class="bars">' + bar("protein","Protein","var(--protein)") + bar("carbs","Carbs","var(--carbs)") + bar("fat","Fat","var(--fat)") + '</div>' +
     '<div class="dish-ings">' +
@@ -1395,9 +2058,10 @@ function dishHTML(d, idx, t, isExample, isNew){
     '</div>' +
     '<div class="dish-actions">' +
       '<button type="button" class="btn btn-ghost" data-recipe="' + esc((isExample ? "ex:" : "") + d.name) + '" aria-expanded="' + open + '">' + icon("book") + (open ? "Hide recipe" : "View recipe") + '</button>' +
+      (isExample ? "" : '<button type="button" class="btn btn-ghost" data-cook="' + esc(d.name) + '">' + icon("play") + 'Cook mode</button>') +
       (isExample ? "" : '<button type="button" class="btn btn-ghost btn-cooked" data-cooked="' + esc(d.name) + '" aria-pressed="' + cooked + '">' + icon("check") + (cooked ? "Cooked" : "Cooked this") + '</button>') +
     '</div>' +
-    '<div class="recipe' + (open ? " open" : "") + '"><ol>' + d.steps.map(function(s){ return '<li><span>' + esc(s) + '</span></li>'; }).join("") + '</ol></div>' +
+    '<div class="recipe' + (open ? " open" : "") + (open && justOpened === (isExample ? "ex:" : "") + d.name ? " anim" : "") + '">' + (open ? recipeHTML(d, rkey, ctx) : "") + '</div>' +
   '</article>';
 }
 function skeletonHTML(){
@@ -1405,10 +2069,11 @@ function skeletonHTML(){
 }
 function summaryTags(){
   var t = gen.target || mealTarget(), tags = ['<span class="tag">' + icon("flame") + '<span class="num">~' + fmt(t.kcal) + ' kcal</span></span>'];
-  var s = gen.summary.length ? gen.summary : [FOCUS_LABEL[state.focus], state.time !== "any" ? "≤ " + state.time + " min" : "", MOOD_LABEL[state.mood]];
+  var s = gen.summary.length ? gen.summary : summaryList();
   s.forEach(function(x){ if(x) tags.push('<span class="tag">' + esc(x) + '</span>'); });
   return tags.join("");
 }
+function summaryList(){ return [FOCUS_LABEL[state.focus], state.style && state.style !== "any" ? STYLE_LABEL[state.style] : "", TIME_LABEL[state.time], state.prepped ? "Protein pre-cooked" : "", MOOD_LABEL[state.mood]]; }
 function renderResults(){
   var body = $("resultsBody"), t = gen.target || mealTarget(), html = "";
   if(gen.status === "idle"){
@@ -1440,12 +2105,19 @@ function renderRecent(){
 /* ---------- Generation ----------
    The page sends structured choices to /api/dishes; the server builds the prompt,
    calls the AI model with the secret key, and streams back one JSON dish per line. */
+// Per-100 g nutrition for the picked staples, so the AI calculates macros from the same numbers.
+function kitchenRef(){
+  var ref = {};
+  state.kitchen.slice(0, 60).forEach(function(k){ var s = stapleInfo(k); if(s) ref[s[0]] = [s[2], s[3], s[4], s[5], s[6]]; });
+  return ref;
+}
 function buildPayload(t, shown){
   return {
     target:{ kcal:Math.round(t.kcal), protein:Math.round(t.protein), carbs:Math.round(t.carbs), fat:Math.round(t.fat) },
     kitchen:state.kitchen.slice(0, 60),
     diet:state.diet, avoid:(state.avoid || []).slice(0, 10),
-    time:state.time, mood:state.mood,
+    time:state.time, mood:state.mood, prepped:!!state.prepped, goal:state.goal, style:state.style || "any",
+    ref:kitchenRef(),
     recent:state.recentlyMade.map(function(r){ return r.name; }).slice(0, 10),
     shown:(shown || []).slice(0, 6)
   };
@@ -1453,13 +2125,21 @@ function buildPayload(t, shown){
 function normDish(o){
   if(!o || typeof o !== "object" || !o.name) return null;
   var P = Math.max(0, +o.protein || 0), C = Math.max(0, +o.carbs || 0), F = Math.max(0, +o.fat || 0);
-  return {
+  var d = {
     name:String(o.name).slice(0, 80), tagline:o.tagline ? String(o.tagline).slice(0, 140) : "",
-    minutes:+o.minutes || 0, protein:P, carbs:C, fat:F, kcal:P*4 + C*4 + F*9,
+    protein:P, carbs:C, fat:F, kcal:P*4 + C*4 + F*9,
     uses:Array.isArray(o.uses) ? o.uses.map(String).slice(0, 12) : [],
     extra:Array.isArray(o.extra) ? o.extra.map(String).slice(0, 4) : [],
-    steps:Array.isArray(o.steps) ? o.steps.map(String).slice(0, 8) : []
+    ingredients:Array.isArray(o.ingredients) ? o.ingredients.map(normIng).filter(Boolean).slice(0, 20) : [],
+    steps:Array.isArray(o.steps) ? splitSteps(o.steps.slice(0, 12)) : []
   };
+  // Times: prep + cook (older replies only had one "minutes" number).
+  d.prepMin = Math.round(Math.max(0, +o.prepMin || 0)); d.cookMin = Math.round(Math.max(0, +o.cookMin || 0));
+  if(!d.prepMin && !d.cookMin) d.cookMin = Math.round(Math.max(0, +o.minutes || 0));
+  d.soakHours = Math.round(Math.max(0, +o.soakHours || 0));
+  d.total = d.prepMin + d.cookMin;
+  d.overTime = o.overTime === true;   // server: nothing faster came back, so this one is over the time filter
+  return d;
 }
 function tryParseLine(line){
   line = line.trim().replace(/^```(json)?/i, "").replace(/```$/, "").replace(/,$/, "").trim();
@@ -1532,7 +2212,7 @@ function generate(again){
   var shown = again ? gen.dishes.map(function(d){ return d.name; }) : [];
   var ctl = new AbortController();
   gen = { status:"loading", dishes:[], error:"", ctl:ctl, target:t, retry:true,
-          summary:[FOCUS_LABEL[state.focus], state.time !== "any" ? "≤ " + state.time + " min" : "", MOOD_LABEL[state.mood]] };
+          summary:summaryList() };
   openRecipe = {}; shownCount = 0;
   renderResults(); renderCTA();
   if(window.matchMedia("(max-width: 979px)").matches) $("resultsPane").scrollIntoView({ behavior:"smooth", block:"start" });
@@ -1567,6 +2247,19 @@ function findDish(list, name){ return list.filter(function(d){ return d.name ===
 function cookedToast(added){ toast(added ? "Cooked · added to Today" : "Removed from recently cooked and Today"); }
 
 /* ---------- Main events ---------- */
+// Servings stepper: change the count, redraw, and keep focus on the same button.
+function stepServings(b, ctx, redraw, root){
+  var key = b.getAttribute("data-key"), d = +b.getAttribute("data-serv");
+  servingsFor[key] = Math.max(1, Math.min(8, servingsOf(key, ctx) + d));
+  redraw();
+  var nb = root.querySelector('[data-serv="' + d + '"][data-key="' + CSS.escape(key) + '"]');
+  if(nb && !nb.disabled) nb.focus();
+  else { var other = root.querySelector('[data-serv][data-key="' + CSS.escape(key) + '"]:not([disabled])'); if(other) other.focus(); }
+}
+// Ingredient checklist ticks are remembered while the page is open.
+function onCheck(e){ var c = e.target.getAttribute && e.target.getAttribute("data-check"); if(c) checkedIng[c] = e.target.checked; }
+$("resultsPane").addEventListener("change", onCheck);
+$("gapBody").addEventListener("change", onCheck);
 document.querySelectorAll(".day-seg").forEach(function(g){
   g.addEventListener("click", function(e){
     var b = e.target.closest("[data-day]"); if(!b) return;
@@ -1579,6 +2272,7 @@ $("focusChips").addEventListener("click", function(e){
   state.focus = b.getAttribute("data-focus"); save(); renderFocus(); renderTarget(); if(gen.status === "idle") renderResults();
 });
 $("timeChips").addEventListener("click", function(e){ var b = e.target.closest("[data-time]"); if(!b) return; state.time = b.getAttribute("data-time"); save(); renderPrefs(); });
+$("preppedChip").addEventListener("click", function(){ state.prepped = !state.prepped; save(); renderPrefs(); });
 $("moodChips").addEventListener("click", function(e){ var b = e.target.closest("[data-mood]"); if(!b) return; state.mood = b.getAttribute("data-mood"); save(); renderPrefs(); });
 $("catTabs").addEventListener("click", function(e){ var b = e.target.closest("[data-cat]"); if(!b) return; activeCat = b.getAttribute("data-cat"); renderKitchen(); });
 $("stapleChips").addEventListener("click", function(e){ var b = e.target.closest("[data-staple]"); if(!b) return; toggleItem(b.getAttribute("data-staple")); });
@@ -1611,7 +2305,10 @@ $("resultsPane").addEventListener("click", function(e){
   if(b.id === "againBtn"){ generate(true); return; }
   if(b.id === "retryBtn"){ gen.status = "idle"; generate(false); return; }
   var r = b.getAttribute("data-recipe");
-  if(r){ openRecipe[r] = !openRecipe[r]; renderResults(); var nb = $("resultsPane").querySelector('[data-recipe="' + CSS.escape(r) + '"]'); if(nb) nb.focus(); return; }
+  if(r){ openRecipe[r] = !openRecipe[r]; justOpened = r; renderResults(); justOpened = null; var nb = $("resultsPane").querySelector('[data-recipe="' + CSS.escape(r) + '"]'); if(nb) nb.focus(); return; }
+  if(b.getAttribute("data-serv")){ stepServings(b, "cook", renderResults, $("resultsPane")); return; }
+  var ck = b.getAttribute("data-cook");
+  if(ck){ startCook(findDish(gen.dishes, ck), ck, "cook"); return; }
   var c = b.getAttribute("data-cooked");
   if(c){ cookedToast(markCooked(c, findDish(gen.dishes, c))); var nb2 = $("resultsPane").querySelector('[data-cooked="' + CSS.escape(c) + '"]'); if(nb2) nb2.focus(); return; }
   var u = b.getAttribute("data-unrecent");
@@ -1742,7 +2439,7 @@ function renderLogged(){
   $("loggedList").innerHTML = items.length ? items.map(function(it){
     return '<div class="logged-row"><span><span class="n">' + esc(it.name) + '</span><span class="m">' + fmt(it.kcal) + ' kcal · ' + macroText(it) + '</span></span>' +
       '<button type="button" data-unlog="' + esc(it.id) + '" aria-label="Remove ' + esc(it.name) + ' from today">' + icon("x") + '</button></div>';
-  }).join("") : '<span class="empty-note">Tap “Cooked this” on any dish and it lands here with its macros.</span>';
+  }).join("") : '<span class="empty-note">Tap “Cooked this” on a dish, or log what you ate above, and it lands here with its macros.</span>';
 }
 function renderGap(){
   var t = gapTarget(), noKitchen = !state.kitchen.length, done = t.left.kcal < GAP_MIN, busy = gap.status === "loading";
@@ -1758,7 +2455,7 @@ function renderGap(){
   if(gap.status !== "idle"){
     html = '<div class="res-head"><div><h2>' + (busy ? "Finding ideas…" : gap.dishes.length ? "Ideas for your gap" : "No ideas yet") + '</h2></div>' +
       (gap.status === "done" && gap.dishes.length && !done && !noKitchen ? '<button type="button" class="btn btn-ghost" id="gapAgain" style="padding:9px 14px;font-size:14px">' + icon("refresh") + 'Two more</button>' : "") + '</div>';
-    html += '<div style="display:grid;gap:14px;margin-top:14px">' + gap.dishes.map(function(d, i){ return dishHTML(d, i, gap.target, false, i >= gapShown); }).join("");
+    html += '<div style="display:grid;gap:14px;margin-top:14px">' + gap.dishes.map(function(d, i){ return dishHTML(d, i, gap.target, false, i >= gapShown, "gap"); }).join("");
     if(busy) for(var i = gap.dishes.length; i < 2; i++) html += skeletonHTML();
     html += '</div>';
     if(busy && !gap.dishes.length) html += '<div class="status-line" style="margin-top:12px"><span class="spinner"></span>Fitting your kitchen to what’s left…</div>';
@@ -1825,7 +2522,10 @@ $("todayView").addEventListener("click", function(e){
   if(b.id === "gapAgain"){ closeGap(true); return; }
   if(b.id === "gapRetry"){ gap.status = "idle"; closeGap(false); return; }
   var r = b.getAttribute("data-recipe");
-  if(r){ openRecipe[r] = !openRecipe[r]; renderGap(); var rb = $("gapBody").querySelector('[data-recipe="' + CSS.escape(r) + '"]'); if(rb) rb.focus(); return; }
+  if(r){ openRecipe[r] = !openRecipe[r]; justOpened = r; renderGap(); justOpened = null; var rb = $("gapBody").querySelector('[data-recipe="' + CSS.escape(r) + '"]'); if(rb) rb.focus(); return; }
+  if(b.getAttribute("data-serv")){ stepServings(b, "gap", renderGap, $("gapBody")); return; }
+  var ck = b.getAttribute("data-cook");
+  if(ck){ startCook(findDish(gap.dishes, ck), "gap:" + ck, "gap"); return; }
   var c = b.getAttribute("data-cooked");
   if(c){ cookedToast(markCooked(c, findDish(gap.dishes, c))); var cb = $("gapBody").querySelector('[data-cooked="' + CSS.escape(c) + '"]'); if(cb) cb.focus(); }
 });
@@ -1937,6 +2637,7 @@ function renderPfTargets(){
       '<span class="d">' + icon("moon") + 'Rest</span><span class="c">' + fmt(dt.rest.kcal) + '</span><span class="c">' + dt.rest.protein + '</span><span class="c">' + dt.rest.carbs + '</span><span class="c">' + dt.rest.fat + '</span></div>';
     var dd = deltaChip(dt.training.kcal, bt.kcal);
     if(dd) html += '<p style="font-size:12.5px;color:var(--muted);display:flex;gap:6px;align-items:center">Updated from your changes ' + dd + '<span>kcal on training days</span></p>';
+    html += warnHTML(inputWarnings(state.body, state.goal), state.dismissed);
     html += howItWorks(dt.calc, state.units);
   } else if(!auto){
     html += '<div class="tgt-grid"><span></span><span class="h">kcal</span><span class="h">P</span><span class="h">C</span><span class="h">F</span>' +
@@ -1997,6 +2698,7 @@ function pfChanged(opts){
 $("drawer").addEventListener("click", function(e){
   var b = e.target.closest("button"); if(!b) return;
   if(b.id === "pfClose"){ closeProfile(); return; }
+  var wa = b.getAttribute("data-warn"); if(wa){ warnAction(wa, "pf"); return; }
   if(b.id === "pfLogBtn"){
     var inp = $("pfLogW"), v = parseFloat(inp.value);
     if(!(v > 0)){ inp.focus(); return; }
@@ -2027,7 +2729,13 @@ $("drawer").addEventListener("click", function(e){
     if(pf === "goal"){ state.goal = v; setPressed(b.parentElement, "data-v", v); $("pfPaceRow").hidden = !(v === "lose" || v === "gain"); pfChanged(); return; }
     if(pf === "pace"){ state.pace = v; setPressed(b.parentElement, "data-v", v); pfChanged(); return; }
     if(pf === "diet"){ state.diet = v; setPressed(b.parentElement, "data-v", v); pfChanged({ targets:false }); return; }
-    if(pf === "mode"){ state.targetMode = v; pfChanged(); var mb = $("pfTargets").querySelector('[data-pf="mode"][data-v="' + v + '"]'); if(mb) mb.focus(); return; }
+    if(pf === "mode"){
+      // First time on "My numbers" (still the placeholder numbers): start from what the calculator gave.
+      if(v === "custom" && hasBody() && state.custom.training.kcal === 2200 && state.custom.training.protein === 150 && state.custom.rest.kcal === 1950 && state.custom.rest.carbs === 170){
+        var cc = calcFor(state);
+        ["training", "rest"].forEach(function(k){ state.custom[k] = { kcal:Math.round(cc[k].kcal), protein:Math.round(cc[k].protein), carbs:Math.round(cc[k].carbs), fat:Math.round(cc[k].fat) }; });
+      }
+      state.targetMode = v; pfChanged(); var mb = $("pfTargets").querySelector('[data-pf="mode"][data-v="' + v + '"]'); if(mb) mb.focus(); return; }
     if(pf === "wunit" || pf === "hunit"){
       state.units[pf === "wunit" ? "weight" : "height"] = v; save(); renderProfile(); renderTarget();
       var ub = $("drawer").querySelector('[data-pf="' + pf + '"][data-v="' + v + '"]'); if(ub) ub.focus(); return;
@@ -2061,6 +2769,8 @@ $("drawer").addEventListener("change", function(e){
     var p = mk.split(":"), m = state.custom[p[0]];
     m[p[1]] = Math.max(0, +t.value || 0);
     if(p[1] !== "kcal") m.kcal = m.protein*4 + m.carbs*4 + m.fat*9;
+    // Calories typed directly: carbs take up the difference so protein, carbs and fat still add up to it.
+    else { m.carbs = Math.max(0, Math.round((m.kcal - m.protein*4 - m.fat*9)/4)); var cin = $("pf-" + p[0] + "-carbs"); if(cin) cin.value = m.carbs; m.kcal = m.protein*4 + m.carbs*4 + m.fat*9; }
     var kin = $("pf-" + p[0] + "-kcal"); if(kin && p[1] !== "kcal") kin.value = Math.round(m.kcal);
     pfChanged({ targets:false }); return;
   }
@@ -2081,6 +2791,490 @@ document.addEventListener("keydown", function(e){
     else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
   }
 });
+
+/* =====================================================================
+   Sheets (popups) and the newer features: photo pantry scan, recipe by
+   name, food log (text or photo), goal style chips, Cook mode.
+   Every AI call goes through the server; the page only shows results
+   the person can review and edit before anything is saved.
+   ===================================================================== */
+var sheetCtl = null, sheetHandler = null, sheetOnClose = null, sheetFocusBack = null;
+function sheetOpen(){ return $("sheet").classList.contains("open"); }
+function openSheet(html, opts){
+  opts = opts || {};
+  var s = $("sheet");
+  if(!sheetOpen()) sheetFocusBack = document.activeElement;
+  s.innerHTML = html;
+  s.className = "sheet open" + (opts.full ? " full" : "");
+  s.setAttribute("aria-hidden", "false");
+  $("sheetScrim").classList.add("open"); document.body.classList.add("sheet-open");
+  sheetHandler = opts.onClick || null; sheetOnClose = opts.onClose || null;
+  s.setAttribute("aria-label", opts.label || "Dialog");
+  if(opts.focus){ var f = s.querySelector(opts.focus); if(f) f.focus(); }
+}
+function setSheet(html){ $("sheet").innerHTML = html; }
+function closeSheet(){
+  if(!sheetOpen()) return;
+  if(sheetCtl){ try{ sheetCtl.abort(); }catch(e){} sheetCtl = null; }
+  var cb = sheetOnClose; sheetOnClose = null; sheetHandler = null;
+  $("sheet").className = "sheet"; $("sheet").setAttribute("aria-hidden", "true"); $("sheet").innerHTML = "";
+  $("sheetScrim").classList.remove("open"); document.body.classList.remove("sheet-open");
+  if(cb) cb();
+  if(sheetFocusBack && sheetFocusBack.focus){ try{ sheetFocusBack.focus(); }catch(e){} }
+}
+$("sheetScrim").addEventListener("click", closeSheet);
+$("sheet").addEventListener("click", function(e){
+  if(e.target.closest("[data-sclose]")){ closeSheet(); return; }
+  if(sheetHandler) sheetHandler(e);
+});
+$("sheet").addEventListener("change", function(e){ onCheck(e); });
+function sheetHead(title, sub, noClose){
+  return '<div class="sheet-head"><div><h2>' + esc(title) + '</h2>' + (sub ? '<p>' + esc(sub) + '</p>' : "") + '</div>' +
+    (noClose ? "" : '<button type="button" class="icon-btn" data-sclose aria-label="Close">' + icon("x") + '</button>') + '</div>';
+}
+function sheetBusy(title, msg){
+  return sheetHead(title) + '<div class="sheet-center"><span class="spinner"></span><b>' + esc(msg) + '</b><span>This can take up to 20 seconds.</span></div>';
+}
+function sheetError(title, msg, retryAttr){
+  return sheetHead(title) + '<div class="sheet-center"><b>Couldn’t do that</b><span>' + esc(msg) + '</span></div>' +
+    '<div class="sheet-foot">' + (retryAttr ? '<button type="button" class="btn btn-primary" ' + retryAttr + '>Try again</button>' : "") + '<button type="button" class="btn btn-ghost" data-sclose>Close</button></div>';
+}
+function postJSON(url, body, signal){
+  return fetch(url, { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify(body), signal:signal }).then(function(r){
+    return r.json().catch(function(){ return {}; }).then(function(j){
+      if(!r.ok) throw new Error(j.error || "Something went wrong. Try again.");
+      return j;
+    });
+  }, function(err){
+    if(err && err.name === "AbortError") throw err;
+    throw new Error("Can’t reach the server. Check your internet and try again.");
+  });
+}
+// Photos are shrunk in the browser (about 1024 px, JPEG) so uploads are small and quick.
+function shrinkImage(file){
+  return new Promise(function(resolve, reject){
+    function draw(src, w, h){
+      var k = Math.min(1, 1024 / Math.max(w, h)), c = document.createElement("canvas");
+      c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+      c.getContext("2d").drawImage(src, 0, 0, c.width, c.height);
+      resolve(c.toDataURL("image/jpeg", 0.72));
+    }
+    if(window.createImageBitmap){
+      createImageBitmap(file, { imageOrientation:"from-image" }).then(function(bm){ draw(bm, bm.width, bm.height); }, fallback);
+    } else fallback();
+    function fallback(){
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function(){ draw(img, img.naturalWidth, img.naturalHeight); URL.revokeObjectURL(url); };
+      img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error("bad image")); };
+      img.src = url;
+    }
+  });
+}
+function pickPhoto(cb){
+  var inp = document.createElement("input");
+  inp.type = "file"; inp.accept = "image/*";
+  inp.addEventListener("change", function(){
+    var f = inp.files && inp.files[0]; if(!f) return;
+    shrinkImage(f).then(cb, function(){ toast("Couldn’t read that photo"); });
+  });
+  inp.click();
+}
+
+/* ---------- Photo of your kitchen ---------- */
+var scanRes = [];
+function scanStart(){
+  pickPhoto(function(dataUrl){
+    sheetCtl = new AbortController();
+    openSheet(sheetBusy("Looking at your photo", "Finding ingredients…"), { onClick:scanClick, label:"Add from photo" });
+    postJSON("/api/scan", { image:dataUrl }, sheetCtl.signal).then(function(j){
+      scanRes = (j.items || []).map(function(it){ return { name:it.name, conf:it.confidence, on:it.confidence !== "low" }; });
+      renderScan();
+    }, function(err){
+      if(err && err.name === "AbortError") return;
+      setSheet(sheetError("Add from photo", err.message, "data-sretry"));
+    });
+  });
+}
+function scanClick(e){
+  if(e.target.closest("[data-sretry]")){ scanStart(); return; }
+  if(e.target.closest("[data-sadd]")){
+    var n = 0; scanRes.forEach(function(it){ if(it.on && !inKitchen(it.name)){ addItem(it.name); n++; } });
+    closeSheet(); toast(n ? n + " added to your kitchen" : "Nothing new to add"); return;
+  }
+  var row = e.target.closest("[data-sidx]");
+  if(row && e.target.tagName !== "INPUT"){ /* label click toggles the input itself */ }
+}
+function inKitchen(name){ return state.kitchen.some(function(k){ return k.toLowerCase() === String(name).toLowerCase(); }); }
+function renderScan(){
+  var html;
+  if(!scanRes.length){
+    html = sheetHead("Add from photo") + '<div class="sheet-center"><b>No food found</b><span>Try a closer, brighter photo of the shelf or bag.</span></div>' +
+      '<div class="sheet-foot"><button type="button" class="btn btn-primary" data-sretry>Try another photo</button><button type="button" class="btn btn-ghost" data-sclose>Close</button></div>';
+  } else {
+    html = sheetHead("Add from photo", "Tick what you really have. Check the list: the AI can miss things or get it wrong.") +
+      '<div class="sheet-body"><div class="scan-list">' + scanRes.map(function(it, i){
+        var have = inKitchen(it.name);
+        return '<label class="scan-row' + (have ? " dim" : "") + '"><input type="checkbox" data-sidx="' + i + '"' + (it.on && !have ? " checked" : "") + (have ? " disabled" : "") + '>' +
+          '<span>' + esc(it.name) + '</span><small>' + (have ? "already added" : it.conf === "low" ? "not sure" : "") + '</small></label>';
+      }).join("") + '</div></div>' +
+      '<div class="sheet-foot"><button type="button" class="btn btn-primary" data-sadd>Add to my kitchen</button><button type="button" class="btn btn-ghost" data-sclose>Cancel</button></div>';
+  }
+  setSheet(html);
+  Array.prototype.forEach.call($("sheet").querySelectorAll("[data-sidx]"), function(c){
+    c.addEventListener("change", function(){ scanRes[+c.getAttribute("data-sidx")].on = c.checked; });
+  });
+}
+$("scanBtn").addEventListener("click", scanStart);
+
+/* ---------- Just the recipe ---------- */
+var qr = { name:"", dish:null, key:"" };
+function recipeByName(name){
+  name = String(name || "").trim().replace(/\s+/g, " ");
+  if(!name){ $("qrInput").focus(); return; }
+  qr = { name:name, dish:null, key:"qr:" + name.toLowerCase() };
+  sheetCtl = new AbortController();
+  openSheet(sheetBusy(name.charAt(0).toUpperCase() + name.slice(1), "Writing your recipe…"), { onClick:qrClick, full:true, label:"Recipe" });
+  postJSON("/api/recipe", { dish:name, diet:state.diet, avoid:(state.avoid || []).slice(0, 10) }, sheetCtl.signal).then(function(j){
+    var d = normDish(j.dish);
+    if(!d || !d.steps.length) throw new Error("The AI sent something we couldn’t read. Try again.");
+    qr.dish = d; renderQR();
+  }, function(err){
+    if(err && err.name === "AbortError") return;
+    setSheet(sheetError("Recipe", err.message, "data-sretry"));
+  });
+}
+function renderQR(){
+  var d = qr.dish, cooked = state.recentlyMade.some(function(r){ return r.name === d.name; });
+  var body = $("sheet").querySelector(".sheet-body"), top = body ? body.scrollTop : 0;
+  setSheet(sheetHead(d.name, d.tagline) +
+    '<div class="sheet-body"><div class="recipe open">' + recipeHTML(d, qr.key, "recipe") + '</div>' +
+    '<p class="sheet-note">Not matched to your macro target. Amounts and calories are estimates.</p></div>' +
+    '<div class="sheet-foot"><button type="button" class="btn btn-primary" data-cook>' + icon("play") + 'Cook mode</button>' +
+    '<button type="button" class="btn btn-ghost btn-cooked" data-qcooked aria-pressed="' + cooked + '">' + icon("check") + (cooked ? "Cooked" : "Cooked this") + '</button></div>');
+  var nb = $("sheet").querySelector(".sheet-body"); if(nb) nb.scrollTop = top;
+}
+function qrClick(e){
+  if(e.target.closest("[data-sretry]")){ recipeByName(qr.name); return; }
+  var s = e.target.closest("[data-serv]");
+  if(s){ stepServings(s, "recipe", renderQR, $("sheet")); return; }
+  if(e.target.closest("[data-cook]")){ startCook(qr.dish, qr.key, "recipe"); return; }
+  if(e.target.closest("[data-qcooked]")){ cookedToast(markCooked(qr.dish.name, qr.dish)); renderQR(); }
+}
+$("qrBtn").addEventListener("click", function(){ recipeByName($("qrInput").value); });
+$("qrInput").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); recipeByName(this.value); } });
+
+/* ---------- Goal style chips ---------- */
+var STYLE_LABEL = { any:"Anything", balanced:"Balanced plate", filling:"Keeps me full", protein:"Protein-packed", light:"Light & fresh",
+  dense:"Calorie-dense", easy:"Easy to eat", post:"Post-workout", pre:"Pre-workout", comfort:"Comfort food" };
+var STYLE_BY_GOAL = { lose:["filling","protein","light"], recomp:["protein","post","pre","balanced"], maintain:["balanced","comfort","light"], gain:["dense","easy","post","pre"] };
+function styleOptions(){ return ["any"].concat(STYLE_BY_GOAL[state.goal] || []); }
+function renderStyle(){
+  var opts = styleOptions();
+  if(opts.indexOf(state.style) === -1) state.style = "any";
+  $("styleChips").innerHTML = opts.map(function(k){
+    return '<button type="button" class="chip" data-style="' + k + '" aria-pressed="' + (state.style === k) + '">' + STYLE_LABEL[k] + '</button>';
+  }).join("");
+}
+$("styleChips").addEventListener("click", function(e){
+  var b = e.target.closest("[data-style]"); if(!b) return;
+  state.style = b.getAttribute("data-style"); save(); renderStyle();
+});
+
+/* ---------- Food log ---------- */
+var food = null;
+function foodTotal(){
+  var t = { kcal:0, protein:0, carbs:0, fat:0 };
+  food.items.forEach(function(it){ ["kcal","protein","carbs","fat"].forEach(function(k){ t[k] += it[k] * food.scale; }); });
+  ["kcal","protein","carbs","fat"].forEach(function(k){ t[k] = Math.round(t[k]); });
+  return t;
+}
+function logMeal(name, m){
+  var rec = macrosOf(m);
+  todayLog().push(Object.assign({ id:uid(), name:String(name).slice(0, 60), src:"food" }, rec)); saveLog();
+  var key = String(name).toLowerCase();
+  state.foodHistory = (state.foodHistory || []).filter(function(h){ return h.name.toLowerCase() !== key; });
+  state.foodHistory.unshift(Object.assign({ name:String(name).slice(0, 60) }, rec));
+  state.foodHistory = state.foodHistory.slice(0, 10);
+  save(); renderFoodRecent(); renderToday();
+}
+function renderFoodRecent(){
+  var h = state.foodHistory || [];
+  $("foodRecent").innerHTML = h.length ? '<span class="eyebrow" style="width:100%">Log again</span>' + h.slice(0, 6).map(function(x, i){
+    return '<button type="button" class="chip small" data-frecent="' + i + '">' + esc(x.name) + ' · ' + fmt(x.kcal) + '</button>';
+  }).join("") : "";
+}
+function foodStart(req){
+  food = null;
+  sheetCtl = new AbortController();
+  openSheet(sheetBusy("Estimating your meal", "Working out calories…"), { onClick:foodClick, label:"Log what you ate" });
+  postJSON("/api/food", req, sheetCtl.signal).then(function(j){
+    food = { title:j.title || "Meal", items:(j.items || []).map(function(it){ return { name:it.name, qty:it.qty, kcal:it.kcal, protein:it.protein, carbs:it.carbs, fat:it.fat }; }), scale:1, note:j.note || "" };
+    renderFood();
+  }, function(err){
+    if(err && err.name === "AbortError") return;
+    renderFoodManual(err.message, req.text || "");
+  });
+}
+function renderFood(){
+  var t = foodTotal(), pct = Math.round(food.scale * 100);
+  setSheet(sheetHead("Check and log", "Estimates are rough. Edit before adding.") +
+    '<div class="sheet-body"><label class="field"><span class="eyebrow">Meal name</span><input class="input" id="foodTitle" type="text" maxlength="40" value="' + esc(food.title) + '"></label>' +
+    '<div class="food-list">' + food.items.map(function(it, i){
+      return '<div class="food-row"><span class="n">' + esc(it.name) + (it.qty ? '<small>' + esc(it.qty) + '</small>' : "") + '</span>' +
+        '<span class="k">' + fmt(it.kcal * food.scale) + ' kcal</span><button type="button" data-fdel="' + i + '" aria-label="Remove ' + esc(it.name) + '">' + icon("x") + '</button></div>';
+    }).join("") + '</div>' +
+    '<div class="food-total"><b>' + fmt(t.kcal) + ' kcal</b><span>' + t.protein + 'P · ' + t.carbs + 'C · ' + t.fat + 'F</span></div>' +
+    '<div class="food-tools"><div class="rx-serv"><span class="eyebrow">Portion</span><div class="stepper sm">' +
+      '<button type="button" data-fscale="-0.25" aria-label="Smaller portion"' + (food.scale <= 0.25 ? " disabled" : "") + '>−</button><span class="val">' + pct + '%</span>' +
+      '<button type="button" data-fscale="0.25" aria-label="Bigger portion"' + (food.scale >= 3 ? " disabled" : "") + '>+</button></div></div>' +
+      '<button type="button" class="textlink" data-foil>+ 1 tsp oil or ghee</button></div>' +
+    (food.note ? '<div class="warn-soft">' + esc(food.note) + '</div>' : "") +
+    '<p class="sheet-note">Hidden oil and ghee are the usual miss. If the dish was oily, add some.</p></div>' +
+    '<div class="sheet-foot"><button type="button" class="btn btn-primary" data-fadd' + (food.items.length ? "" : " disabled") + '>Add to today</button><button type="button" class="btn btn-ghost" data-sclose>Cancel</button></div>');
+}
+function renderFoodManual(msg, text){
+  setSheet(sheetHead("Add it yourself", msg) +
+    '<div class="sheet-body"><label class="field"><span class="eyebrow">Name</span><input class="input" id="mfName" type="text" maxlength="40" value="' + esc(text) + '"></label>' +
+    '<div class="manual-grid"><label class="mini">Protein g<input class="input" id="mfP" type="number" min="0" inputmode="numeric"></label>' +
+    '<label class="mini">Carbs g<input class="input" id="mfC" type="number" min="0" inputmode="numeric"></label>' +
+    '<label class="mini">Fat g<input class="input" id="mfF" type="number" min="0" inputmode="numeric"></label></div></div>' +
+    '<div class="sheet-foot"><button type="button" class="btn btn-primary" data-fmanual>Add to today</button><button type="button" class="btn btn-ghost" data-sclose>Cancel</button></div>');
+}
+function foodClick(e){
+  if(e.target.closest("[data-fmanual]")){
+    var nm = $("mfName").value.trim() || "Meal", m = { protein:+$("mfP").value, carbs:+$("mfC").value, fat:+$("mfF").value };
+    if(!(m.protein || m.carbs || m.fat)){ $("mfP").focus(); return; }
+    logMeal(nm, m); closeSheet(); toast("Added to today"); return;
+  }
+  if(!food) return;
+  var ti = $("foodTitle"); if(ti) food.title = ti.value;
+  var del = e.target.closest("[data-fdel]");
+  if(del){ food.items.splice(+del.getAttribute("data-fdel"), 1); renderFood(); return; }
+  var sc = e.target.closest("[data-fscale]");
+  if(sc){ food.scale = Math.max(0.25, Math.min(3, Math.round((food.scale + +sc.getAttribute("data-fscale")) * 100) / 100)); renderFood(); return; }
+  if(e.target.closest("[data-foil]")){ food.items.push({ name:"Extra oil or ghee", qty:"1 tsp", kcal:45, protein:0, carbs:0, fat:5 }); renderFood(); return; }
+  if(e.target.closest("[data-fadd]")){
+    var t = foodTotal(); logMeal(food.title.trim() || "Meal", t); closeSheet(); toast("Added to today · " + fmt(t.kcal) + " kcal"); food = null;
+  }
+}
+$("foodBtn").addEventListener("click", function(){
+  var v = $("foodInput").value.trim(); if(!v){ $("foodInput").focus(); return; }
+  $("foodInput").value = ""; foodStart({ text:v });
+});
+$("foodInput").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); $("foodBtn").click(); } });
+$("foodPhotoBtn").addEventListener("click", function(){ pickPhoto(function(img){ var v = $("foodInput").value.trim(); $("foodInput").value = ""; foodStart({ image:img, text:v }); }); });
+$("foodRecent").addEventListener("click", function(e){
+  var b = e.target.closest("[data-frecent]"); if(!b) return;
+  var h = (state.foodHistory || [])[+b.getAttribute("data-frecent")]; if(!h) return;
+  logMeal(h.name, h); toast("Added to today · " + fmt(h.kcal) + " kcal");
+});
+
+/* ---------- Cook mode ---------- */
+var cook = null, cookTick = null, wakeLock = null;
+var TIME_RE = /(\d+(?:\.\d+)?)(?:\s*(?:-|–|to)\s*(\d+(?:\.\d+)?))?\s*(hours?|hrs?|minutes?|mins?|seconds?|secs?)\b/i;
+var NUM_WORDS = { one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8, nine:9, ten:10, twelve:12, fifteen:15, twenty:20, "twenty-five":25, thirty:30, forty:40, "forty-five":45, fifty:50, sixty:60 };
+function stepTimer(text){
+  var t = String(text).toLowerCase().replace(/\b(a|an) half hour\b|\bhalf an hour\b/g, "30 minutes").replace(/\b(an|one) hour\b/g, "60 minutes")
+    .replace(/\b(twenty-five|forty-five|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)\b/g, function(w){ return NUM_WORDS[w]; });
+  var m = t.match(TIME_RE); if(!m) return null;
+  var v = +(m[2] || m[1]), u = m[3].toLowerCase().charAt(0);
+  var sec = u === "h" ? v * 3600 : u === "s" ? v : v * 60;
+  return sec >= 10 && sec <= 4 * 3600 ? Math.round(sec) : null;
+}
+function fmtClock(sec){
+  sec = Math.max(0, Math.round(sec));
+  var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+  return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(s).padStart(2, "0");
+}
+// Picks an animated picture from what the step does (the verb, not the ingredients).
+function sceneKind(text){
+  var t = String(text).toLowerCase().replace(/\{[^}]*\}/g, " ").replace(/\b(chopped|sliced|diced|minced|grated|crushed|boiled|soaked|cooked|fried|roasted|mashed|ground)\b/g, " ");
+  if(/\b(serve|plate|garnish|enjoy|top with|sprinkle)\b/.test(t)) return "serve";
+  if(/\b(soak|marinat|ferment|dip)/.test(t)) return "soak";
+  if(/\b(knead|dough|roll out|roll the|flatten|chapati|roti|paratha|dosa batter)\b/.test(t)) return "knead";
+  if(/\b(whistle|pressure|cooker)\b/.test(t)) return "cooker";
+  if(/\b(temper|tadka|crackle|splutter|sizzle)|heat\b.*\b(oil|ghee|butter)/.test(t)) return "tadka";
+  if(/^\W*(chop|slice|cut|dice|mince|grate|peel|wash|rinse|crush|smash|squeeze|drain|trim|cube)/.test(t)) return "chop";
+  if(/\b(mix|combine|whisk|blend|toss|fold|beat|mash|stuff)/.test(t)) return "mix";
+  if(/\b(boil|simmer|bring|steam|blanch)/.test(t)) return "boil";
+  if(/\b(rest|wait|cool|set aside|let it|leave|sit)\b/.test(t)) return "clock";
+  if(/\b(fry|sauté|saute|roast|stir|cook|brown|bhuno|add|heat|toast|sear|grill|saute)/.test(t)) return "stir";
+  return "heat";
+}
+function flames(cx, y){
+  return '<path class="fl" d="M' + (cx - 20) + ' ' + y + ' q-8 -12 0 -24 q8 12 0 24z"/><path class="fl b" d="M' + cx + ' ' + y + ' q-10 -16 0 -32 q10 16 0 32z"/><path class="fl c" d="M' + (cx + 20) + ' ' + y + ' q-8 -12 0 -24 q8 12 0 24z"/>';
+}
+function steamLines(){
+  return '<path class="steam" d="M96 60 q-8 -10 0 -20 q8 -10 0 -20"/><path class="steam" style="animation-delay:.7s" d="M124 58 q-8 -10 0 -20 q8 -10 0 -20"/><path class="steam" style="animation-delay:1.3s" d="M150 60 q-8 -10 0 -20 q8 -10 0 -20"/>';
+}
+function kadai(fill){
+  return '<path class="metal" d="M52 84 q6 42 68 42 t68 -42z"/><rect class="metal" x="186" y="86" width="40" height="8" rx="4"/>' +
+    '<ellipse class="' + fill + '" cx="120" cy="86" rx="64" ry="8"/>';
+}
+function sceneSVG(kind){
+  var b = '<svg class="scene" viewBox="0 0 240 160" role="img" aria-label="Cooking animation">', e = '</svg>', stove = '<path class="line" d="M40 134h160"/>';
+  if(kind === "soak") return b + '<path class="steel" d="M56 70 h128 q-6 52 -64 52 t-64 -52z"/><ellipse class="water" cx="120" cy="72" rx="64" ry="9"/>' +
+    '<circle class="brown sink" cx="98" cy="66" r="9"/><circle class="brown sink" style="animation-delay:.8s" cx="124" cy="64" r="10"/><circle class="brown sink" style="animation-delay:1.6s" cx="148" cy="67" r="8"/>' +
+    '<circle class="bub" cx="108" cy="90" r="4"/><circle class="bub" style="animation-delay:.9s" cx="140" cy="94" r="3"/>' + e;
+  if(kind === "chop") return b + '<rect class="board" x="48" y="108" width="144" height="20" rx="7"/><circle class="red" cx="96" cy="100" r="10"/><circle class="red" cx="118" cy="102" r="8"/><circle class="green" cx="146" cy="103" r="7"/>' +
+    '<g class="knife"><path class="steel" d="M118 34 h46 l-50 62 h-8z"/><rect class="brown" x="160" y="28" width="30" height="9" rx="4"/></g>' + e;
+  if(kind === "knead") return b + '<rect class="board" x="40" y="108" width="160" height="20" rx="7"/><ellipse class="cream spread" cx="120" cy="104" rx="44" ry="10"/>' +
+    '<g class="pin"><rect class="brown" x="86" y="70" width="68" height="14" rx="7"/><rect class="brown" x="74" y="73" width="14" height="8" rx="3"/><rect class="brown" x="152" y="73" width="14" height="8" rx="3"/></g>' + e;
+  if(kind === "cooker") return b + '<path class="steel" d="M66 80 q54 -40 108 0z"/><rect class="metal" x="66" y="80" width="108" height="46" rx="6"/><rect class="metal" x="176" y="86" width="26" height="8" rx="4"/>' +
+    '<rect class="ink jig" x="114" y="56" width="12" height="14" rx="3"/>' + steamLines().replace(/ d="M(\d+) 60/g, ' d="M$1 52') + stove.replace("134", "134") + flames(120, 150).replace(/class="fl/g, 'class="fl') + e;
+  if(kind === "boil") return b + '<rect class="metal" x="64" y="68" width="112" height="58" rx="10"/><rect class="metal" x="52" y="76" width="14" height="9" rx="3"/><rect class="metal" x="174" y="76" width="14" height="9" rx="3"/>' +
+    '<ellipse class="water" cx="120" cy="70" rx="54" ry="7"/><circle class="bub" cx="98" cy="68" r="5"/><circle class="bub" style="animation-delay:.5s" cx="124" cy="66" r="6"/><circle class="bub" style="animation-delay:1s" cx="148" cy="69" r="5"/>' +
+    steamLines() + stove + flames(120, 154) + e;
+  if(kind === "tadka") return b + kadai("oil") + '<circle class="brown seed" cx="100" cy="82" r="3.5"/><circle class="brown seed" style="animation-delay:.25s" cx="120" cy="80" r="3.5"/><circle class="brown seed" style="animation-delay:.5s" cx="140" cy="82" r="3.5"/><circle class="gold seed" style="animation-delay:.15s" cx="130" cy="84" r="3"/>' +
+    stove + flames(120, 156) + e;
+  if(kind === "mix") return b + '<path class="steel" d="M54 76 h132 q-4 50 -66 50 t-66 -50z"/><ellipse class="cream" cx="120" cy="78" rx="66" ry="9"/><g class="spoon"><rect class="brown" x="116" y="26" width="8" height="72" rx="4"/><ellipse class="brown" cx="120" cy="102" rx="11" ry="7"/></g>' + e;
+  if(kind === "serve") return b + '<ellipse class="plate" cx="120" cy="104" rx="76" ry="24"/><path class="cream" d="M84 102 q34 -34 68 0z"/><ellipse class="red" cx="146" cy="104" rx="20" ry="9" opacity=".85"/>' +
+    '<circle class="tw" cx="78" cy="62" r="5"/><circle class="tw" style="animation-delay:.5s" cx="166" cy="50" r="6"/><circle class="tw" style="animation-delay:1s" cx="120" cy="40" r="4"/>' + steamLines().replace(/ d="M(\d+) 60/g, ' d="M$1 78') + e;
+  if(kind === "clock") return b + '<circle class="plate" cx="120" cy="80" r="46"/><path class="line" d="M120 44 v8 M120 108 v8 M84 80 h8 M148 80 h8"/><g class="hand"><path class="line" d="M120 80 v-30"/></g><circle class="ink" cx="120" cy="80" r="4"/>' + e;
+  if(kind === "stir") return b + kadai("red").replace('class="red"', 'class="red" opacity=".75"') + '<g class="spoon"><rect class="brown" x="116" y="30" width="8" height="70" rx="4"/><ellipse class="brown" cx="120" cy="104" rx="11" ry="7"/></g>' + stove + flames(120, 156) + e;
+  return b + kadai("oil") + stove + flames(120, 156) + e;
+}
+function cookScaled(){ return cook.dish.ingredients.map(function(i){ return scaleIng(i, servingsOf(cook.key, cook.ctx)); }); }
+function startCook(d, key, ctx){
+  if(!d || !d.steps.length){ toast("No steps to cook from"); return; }
+  cook = { dish:d, key:key, ctx:ctx, i:0, timers:[] };
+  openSheet("", { full:true, onClick:cookClick, onClose:cookEnd, label:"Cook mode" });
+  renderCook(); acquireWake();
+  if(!cookTick) cookTick = setInterval(tickTimers, 1000);
+}
+function cookEnd(){
+  if(cookTick){ clearInterval(cookTick); cookTick = null; }
+  var running = cook && cook.timers.some(function(t){ return Date.now() < t.end; });
+  cook = null; releaseWake();
+  renderResults(); if(state.view === "today") renderGap();
+  if(running) toast("Cook mode closed · timers stopped");
+}
+function acquireWake(){
+  try{ if(navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request("screen").then(function(l){ wakeLock = l; }, function(){}); }catch(e){}
+}
+function releaseWake(){ try{ if(wakeLock){ wakeLock.release(); wakeLock = null; } }catch(e){} }
+document.addEventListener("visibilitychange", function(){ if(cook && document.visibilityState === "visible") acquireWake(); });
+var audioCtx = null;
+function unlockAudio(){
+  try{
+    var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+    if(!audioCtx) audioCtx = new AC();
+    if(audioCtx.state === "suspended") audioCtx.resume();
+  }catch(e){}
+}
+function beep(){
+  try{
+    unlockAudio(); if(!audioCtx) return;
+    var ctx = audioCtx, t = ctx.currentTime;
+    [0, 0.25, 0.5].forEach(function(o){
+      var osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.frequency.value = 880; osc.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.0001, t + o); g.gain.exponentialRampToValueAtTime(0.35, t + o + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + o + 0.2);
+      osc.start(t + o); osc.stop(t + o + 0.22);
+    });
+  }catch(e){}
+  try{ if(navigator.vibrate) navigator.vibrate([250, 120, 250]); }catch(e){}
+}
+function timersHTML(){
+  return cook.timers.map(function(t, i){
+    var left = Math.ceil((t.end - Date.now()) / 1000);
+    return '<span class="timer' + (left <= 0 ? " done" : "") + '" data-tidx="' + i + '"><small>' + esc(t.label) + '</small><span>' + (left <= 0 ? "Done!" : fmtClock(left)) + '</span>' +
+      '<button type="button" data-tdel="' + t.id + '" aria-label="Remove timer">' + icon("x") + '</button></span>';
+  }).join("");
+}
+function tickTimers(){
+  if(!cook) return;
+  var box = $("cookTimers");
+  cook.timers.forEach(function(t){ if(!t.fired && Date.now() >= t.end){ t.fired = true; beep(); toast(t.label + ": timer done"); } });
+  if(box) box.innerHTML = timersHTML();
+}
+function renderCook(){
+  var d = cook.dish, n = d.steps.length, i = cook.i, scaled = cookScaled(), body, nav;
+  var pct = Math.round(i / (n + 1) * 100);
+  var head = '<div class="cook-head"><div class="cook-title"><b>' + esc(d.name) + '</b><span>' + (i === 0 ? "Get ready" : i > n ? "All done" : "Step " + i + " of " + n) + '</span></div>' +
+    '<button type="button" class="icon-btn" data-sclose aria-label="Close cook mode">' + icon("x") + '</button></div><div class="cook-prog"><span style="width:' + pct + '%"></span></div>' +
+    '<div class="cook-timers" id="cookTimers">' + timersHTML() + '</div>';
+  if(i === 0){
+    var sv = servingsOf(cook.key, cook.ctx);
+    body = '<div class="cook-ready"><h3>Get ready</h3>' +
+      '<div class="rx-head" style="margin-top:10px"><div class="rx-serv"><span class="eyebrow">Servings</span><div class="stepper sm">' +
+      '<button type="button" data-cserv="-1" aria-label="Fewer servings"' + (sv <= 1 ? " disabled" : "") + '>−</button><span class="val">' + sv + '</span>' +
+      '<button type="button" data-cserv="1" aria-label="More servings"' + (sv >= 8 ? " disabled" : "") + '>+</button></div></div></div>' +
+      (d.total ? '<p class="rx-times">Prep <b>' + minText(d.prepMin) + '</b> · Cook <b>' + minText(d.cookMin) + '</b> · Total <b>' + minText(d.total) + '</b>' + (d.soakHours ? ' · Soak <b>' + d.soakHours + ' h</b> ahead' : "") + '</p>' : "") +
+      (scaled.length ? '<span class="eyebrow rx-sec">Have these ready</span>' : "") + '<ul class="checklist">' + scaled.map(function(s, k){
+        var ck = cook.key + "#" + k, home = homeText(s);
+        return '<li><label><input type="checkbox" data-check="' + esc(ck) + '"' + (checkedIng[ck] ? " checked" : "") + '><span class="q">' + esc(qtyText(s)) + '</span><span class="nm">' + esc(countName(s)) + (home ? '<small>' + esc(home) + '</small>' : "") + '</span></label></li>';
+      }).join("") + '</ul></div>';
+    nav = '<button type="button" class="btn btn-primary" data-cnext>Start cooking ' + icon("arrow") + '</button>';
+  } else if(i > n){
+    var cooked = state.recentlyMade.some(function(r){ return r.name === d.name; });
+    body = '<div class="cook-stage">' + sceneSVG("serve") + '</div><div class="cook-done"><h3>Ready to eat</h3><p>' + esc(d.name) + ' is done. Enjoy!</p></div>';
+    nav = '<button type="button" class="btn btn-ghost back" data-cprev aria-label="Previous step">' + icon("arrow", "flip") + '</button>' +
+      '<button type="button" class="btn btn-primary" data-cdone>' + icon("check") + (cooked ? "Already logged" : "Log it to Today") + '</button>';
+  } else {
+    var step = d.steps[i - 1], secs = stepTimer(step);
+    var hasTimer = cook.timers.some(function(t){ return t.step === i && Date.now() < t.end; });
+    var refs = [], re = /\{(\d+)\}/g, mm;
+    while((mm = re.exec(step))){ var ing = scaled[+mm[1] - 1]; if(ing && ing.unit !== "taste" && ing.unit !== "note" && refs.indexOf(ing) === -1) refs.push(ing); }
+    body = '<div class="cook-stage">' + sceneSVG(sceneKind(step)) + '</div>' +
+      '<div class="cook-text">' + stepHTML(step, scaled, []) + '</div>' +
+      (refs.length ? '<div class="cook-uses">' + refs.map(function(s){ return '<span class="ing">' + esc((qtyText(s) ? qtyText(s) + " " : "") + countName(s)) + '</span>'; }).join("") + '</div>' : "") +
+      (secs ? '<div class="cook-act"><button type="button" class="btn btn-ghost" data-tstart="' + secs + '"' + (hasTimer ? " disabled" : "") + '>' + icon("clock") + '<span>' + (hasTimer ? "Timer running" : "Start " + esc(fmtClock(secs)) + " timer") + '</span></button></div>' : "");
+    nav = '<button type="button" class="btn btn-ghost back" data-cprev aria-label="Previous step">' + icon("arrow", "flip") + '</button>' +
+      '<button type="button" class="btn btn-primary" data-cnext>' + (i === n ? "Finish" : "Next step") + ' ' + icon("arrow") + '</button>';
+  }
+  setSheet(head + '<div class="cook-body" id="cookBody">' + body + '</div><div class="cook-nav">' + nav + '</div>');
+  var cb = $("cookBody"), x0 = null;
+  cb.addEventListener("touchstart", function(ev){ x0 = ev.touches[0].clientX; }, { passive:true });
+  cb.addEventListener("touchend", function(ev){
+    if(x0 === null) return; var dx = ev.changedTouches[0].clientX - x0; x0 = null;
+    if(Math.abs(dx) > 70) cookGo(dx < 0 ? 1 : -1);
+  }, { passive:true });
+  var nx = $("sheet").querySelector("[data-cnext], [data-cdone]"); if(nx && i) nx.focus();
+}
+function cookGo(dir){
+  if(!cook) return;
+  cook.i = Math.max(0, Math.min(cook.dish.steps.length + 1, cook.i + dir)); renderCook();
+  var b = $("cookBody"); if(b) b.scrollTop = 0;
+}
+function cookClick(e){
+  if(!cook) return;
+  if(e.target.closest("[data-cnext]")) return cookGo(1);
+  if(e.target.closest("[data-cprev]")) return cookGo(-1);
+  var s = e.target.closest("[data-cserv]");
+  if(s){ servingsFor[cook.key] = Math.max(1, Math.min(8, servingsOf(cook.key, cook.ctx) + +s.getAttribute("data-cserv"))); renderCook(); return; }
+  var ts = e.target.closest("[data-tstart]");
+  if(ts){
+    unlockAudio();
+    var sec = +ts.getAttribute("data-tstart");
+    cook.timers.push({ id:uid(), step:cook.i, label:"Step " + cook.i, end:Date.now() + sec * 1000 });
+    ts.disabled = true; ts.lastChild.textContent = "Timer running"; tickTimers(); return;
+  }
+  var td = e.target.closest("[data-tdel]");
+  if(td){ cook.timers = cook.timers.filter(function(t){ return t.id !== td.getAttribute("data-tdel"); }); tickTimers(); return; }
+  if(e.target.closest("[data-cdone]")){
+    var d = cook.dish;
+    if(!state.recentlyMade.some(function(r){ return r.name === d.name; })){ markCooked(d.name, d); toast("Cooked · added to Today"); }
+    closeSheet();
+  }
+}
+document.addEventListener("keydown", function(e){
+  if(!sheetOpen()) return;
+  if(e.key === "Escape"){ closeSheet(); return; }
+  if(e.key === "Tab"){
+    var f = $("sheet").querySelectorAll('button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    if(!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if(!$("sheet").contains(document.activeElement)){ e.preventDefault(); first.focus(); }
+    else if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    return;
+  }
+  if(cook && e.target.tagName !== "INPUT"){
+    if(e.key === "ArrowRight") cookGo(1); else if(e.key === "ArrowLeft") cookGo(-1);
+  }
+});
+
 
 /* ===================== Boot ===================== */
 load();

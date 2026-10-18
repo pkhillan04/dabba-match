@@ -2,6 +2,17 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": "public",
   "functions": {
-    "api/dishes.js": { "maxDuration": 60 }
+    "api/dishes.js": {
+      "maxDuration": 60
+    },
+    "api/recipe.js": {
+      "maxDuration": 60
+    },
+    "api/scan.js": {
+      "maxDuration": 60
+    },
+    "api/food.js": {
+      "maxDuration": 60
+    }
   }
 }

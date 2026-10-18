@@ -11,14 +11,21 @@
 // quota (429/500/503), or sends no text within 7 s, the next model is tried straight away. If one
 // stops or stalls (10 s with no text) partway, the next model is asked only for the dishes still
 // missing, and the page keeps receiving dishes as if nothing happened. Dishes whose macros are
-// just the target copied are dropped and topped up the same way. Each request logs which
-// model(s) answered.
+// just the target copied, that have no ingredient list or steps, or whose honest cooking time
+// (lib/dish.js raises times that are too low) breaks the time filter are dropped and topped up
+// the same way. Each request logs which model(s) answered.
 
 import { buildPrompt, dishCount, validatePayload } from "../lib/prompt.js";
+import { checkTimes, fitsTime, hasRecipe } from "../lib/dish.js";
+import { fitToTarget, recompute } from "../lib/nutrition.js";
 
 const DEFAULT_GEMINI_MODELS = "gemini-3.8-flash,gemini-3.5-flash-lite,gemini-3.6-flash,gemini-3.1-flash-lite";
+// A dish is "off target" when its recomputed macros miss the meal target by more than this.
+const OFF_KCAL = 0.15;
+const OFF_PROTEIN = 0.25;
 const FIRST_TEXT_MS = 7000; // a model must start answering within this (connecting included)
 const STALL_MS = 10000;     // ...and never go this long without sending more text
+const CHAIN_BUDGET_MS = 40000; // no new model is started after this much time in one request
 const DEFAULT_ANTHROPIC_MODEL = "claude-haiku-4-5";
 const BUSY = "The AI is busy right now. Try again in a moment.";
 const PARTIAL = "The AI is busy right now and stopped partway. Try again in a moment.";
@@ -212,17 +219,38 @@ async function* streamMock(data) {
   const t = data.target;
   const kinds = data.mode === "gap" ? ["snack cup", "quick plate", "power bowl"] : ["masala bowl", "stir-fry", "wrap", "tikka plate"];
   const seen = data.shown.map((s) => s.toLowerCase());
+  // Times are deliberately a bit low on some dishes so the time check has something to fix.
+  const times = [[5, 10], [5, 5], [10, 10], [10, 15]];
   const dishes = kinds
     .map((kind, i) => ({
       name: `${pick(i)} ${kind}`,
       tagline: "Mock dish for testing. Set AI_PROVIDER to gemini for real ones.",
-      minutes: [20, 15, 25, 30][i],
+      prepMin: times[i][0],
+      cookMin: times[i][1],
+      soakHours: 0,
       protein: Math.round(t.protein * [1, 0.92, 1.08, 0.97][i]),
       carbs: Math.round(t.carbs * [1.05, 0.9, 1, 1.02][i]),
       fat: Math.round(t.fat * [0.95, 1.1, 0.9, 1][i]),
       uses: [pick(i), pick(i + 1)],
       extra: i === 1 ? ["Coriander"] : [],
-      steps: ["Prep the ingredients.", "Cook the base.", "Add the main ingredient.", "Season and serve."],
+      ingredients: [
+        { name: "Oil", qty: 1, unit: "tsp" },
+        { name: "Jeera", qty: 0.5, unit: "tsp" },
+        { name: "Onion", qty: 1, unit: "pieces" },
+        { name: pick(i), qty: 0.5, unit: "katori", g: 100 },
+        { name: pick(i + 1), qty: 1, unit: "cup" },
+        { name: "Lemon", qty: 0.5, unit: "pieces" },
+        { name: "Haldi", qty: 0.25, unit: "tsp" },
+        { name: "Salt", qty: 0, unit: "to taste" },
+      ],
+      steps: [
+        "Heat {1} in a kadai on medium flame.",
+        "Add {2} and let it crackle.",
+        "Add chopped {3}. Cook until golden, about 4 minutes.",
+        "Add {4}, {7} and {8}. Mix well.",
+        "Add {5} and cook 5 minutes.",
+        "Squeeze {6} on top and serve.",
+      ],
     }))
     .filter((d) => !seen.includes(d.name.toLowerCase()))
     .slice(0, dishCount(data));
@@ -334,6 +362,12 @@ async function* dishesFromChain(data, signal, run) {
   for (const model of modelChain()) {
     const need = want - run.names.length;
     if (need <= 0) return;
+    // Vercel stops the function at 60 s. Past ~40 s a fresh model rarely finishes in time, so
+    // stop here and send the closest dropped dishes below instead of being cut off mid-answer.
+    if (Date.now() - run.started > CHAIN_BUDGET_MS) {
+      run.attempts.push({ model, dishes: 0, status: "skipped(time)" });
+      break;
+    }
     const attempt = { model, dishes: 0, status: "ok" };
     run.attempts.push(attempt);
     // Ask only for what's missing, and tell the model what the page already has.
@@ -346,6 +380,57 @@ async function* dishesFromChain(data, signal, run) {
       if (run.names.some((n) => n.toLowerCase() === key)) return null;
       if (copiesTarget(d, data.target)) {
         attempt.copied = (attempt.copied || 0) + 1; // always dropped; the next model tops up
+        return null;
+      }
+      if (!hasRecipe(d)) {
+        attempt.norecipe = (attempt.norecipe || 0) + 1;
+        return null;
+      }
+      const claimed = `${Math.round(+d.prepMin || 0)}+${Math.round(+d.cookMin || +d.minutes || 0)}`;
+      const times = checkTimes(d, data);
+      if (times.adjusted) attempt.retimed = (attempt.retimed || 0) + 1;
+      delete d.minutes;
+      Object.assign(d, { prepMin: times.prepMin, cookMin: times.cookMin, soakHours: times.soakHours });
+      // Macros come from the ingredient list, not from the model's own arithmetic. Only used when
+      // nearly every ingredient could be priced; otherwise the model's numbers stay.
+      let rc = process.env.AI_PROVIDER === "mock" ? { coverage: 0, kcal: 0, unmatched: [] } : recompute(d);
+      if (rc.coverage >= 0.8 && rc.kcal > 0) {
+        d.claimedMacros = `${Math.round(+d.protein || 0)}P/${Math.round(+d.carbs || 0)}C/${Math.round(+d.fat || 0)}F`;
+        Object.assign(d, { protein: rc.protein, carbs: rc.carbs, fat: rc.fat });
+        attempt.recalc = (attempt.recalc || 0) + 1;
+        const t = data.target;
+        let errK = Math.abs(rc.kcal - t.kcal) / Math.max(t.kcal, 1);
+        let errP = Math.abs(rc.protein - t.protein) / Math.max(t.protein, 1);
+        // Good recipe, wrong amounts: nudge the amounts toward the target (lib/nutrition.js).
+        if (errK > 0.08 || errP > 0.12) {
+          const fit = fitToTarget(d, t);
+          if (fit) {
+            const fk = Math.abs(fit.after.kcal - t.kcal) / Math.max(t.kcal, 1);
+            const fp = Math.abs(fit.after.p - t.protein) / Math.max(t.protein, 1);
+            if (fk + fp < errK + errP) {
+              Object.assign(d, { ingredients: fit.dish.ingredients, protein: fit.dish.protein, carbs: fit.dish.carbs, fat: fit.dish.fat });
+              rc = { ...rc, protein: fit.dish.protein, carbs: fit.dish.carbs, fat: fit.dish.fat, kcal: fit.after.kcal };
+              [errK, errP] = [fk, fp];
+              attempt.fitted = (attempt.fitted || 0) + 1;
+            }
+          }
+        }
+        if (errK > OFF_KCAL || errP > OFF_PROTEIN) {
+          attempt.off = (attempt.off || 0) + 1; // too far from the meal target; the next model tops up
+          attempt.offNames = attempt.offNames || [];
+          attempt.offNames.push(`"${d.name}" claimed=${d.claimedMacros} real=${rc.protein}P/${rc.carbs}C/${rc.fat}F ${rc.kcal}kcal vs ${t.kcal}kcal/${t.protein}P`);
+          if (!run.off.some((x) => x.name === d.name)) run.off.push({ ...d, _err: errK + errP });
+          return null;
+        }
+      } else if (rc.unmatched.length) {
+        attempt.unpriced = (attempt.unpriced || 0) + 1; // kept the model's numbers
+      }
+      delete d.claimedMacros;
+      if (!fitsTime(d, data.time)) {
+        attempt.slow = (attempt.slow || 0) + 1; // honest time is over the filter; the next model tops up
+        attempt.slowNames = attempt.slowNames || [];
+        if (!run.slow.some((x) => x.name === d.name)) run.slow.push(d);
+        attempt.slowNames.push(`"${d.name}" claimed=${claimed} honest=${times.prepMin}+${times.cookMin}${times.soakHours ? ` soak=${times.soakHours}h` : ""}`);
         return null;
       }
       run.names.push(d.name.trim());
@@ -411,21 +496,42 @@ async function* dishesFromChain(data, signal, run) {
       it?.return?.().catch(() => {});
     }
   }
+  // Every model was tried and dishes are still missing. Rather than an error, show the fastest
+  // of the dishes that were dropped for being slower than the time filter, marked as such.
+  const slow = run.slow.slice().sort((a, b) => a.prepMin + a.cookMin - (b.prepMin + b.cookMin));
+  for (const d of slow) {
+    if (run.names.length >= want) return;
+    if (run.names.some((x) => x.toLowerCase() === d.name.trim().toLowerCase())) continue;
+    run.names.push(d.name.trim());
+    run.overTime = (run.overTime || 0) + 1;
+    yield JSON.stringify({ ...d, overTime: true });
+  }
+  // Same for dishes that were too far from the meal target: show the closest ones rather than fail.
+  const off = run.off.slice().sort((a, b) => a._err - b._err);
+  for (const { _err, ...d } of off) {
+    if (run.names.length >= want) return;
+    if (run.names.some((x) => x.toLowerCase() === d.name.trim().toLowerCase())) continue;
+    run.names.push(d.name.trim());
+    run.offTarget = (run.offTarget || 0) + 1;
+    yield JSON.stringify(fitsTime(d, data.time) ? d : { ...d, overTime: true });
+  }
 }
 
 function logRun(data, run, started) {
   const want = dishCount(data);
   const chain = run.attempts
-    .map((a) => `${a.model}:${a.status}${a.dishes ? `(${a.dishes})` : ""}${a.copied ? `[${a.copied} copied]` : ""}${a.repaired ? `[${a.repaired} repaired]` : ""}${a.cutoff ? "[cut off]" : ""}${a.unreadable ? `[${a.unreadable.length} unreadable]` : ""}${a.finish ? `{${a.finish}}` : a.cutoff || a.status === "short" || a.status === "empty" ? "{no finish}" : ""}${a.firstText !== undefined ? `@${a.firstText}ms` : ""}`)
+    .map((a) => `${a.model}:${a.status}${a.dishes ? `(${a.dishes})` : ""}${a.copied ? `[${a.copied} copied]` : ""}${a.norecipe ? `[${a.norecipe} no recipe]` : ""}${a.slow ? `[${a.slow} too slow]` : ""}${a.off ? `[${a.off} off target]` : ""}${a.unpriced ? `[${a.unpriced} unpriced]` : ""}${a.retimed ? `[${a.retimed} retimed]` : ""}${a.fitted ? `[${a.fitted} amounts fitted]` : ""}${a.repaired ? `[${a.repaired} repaired]` : ""}${a.cutoff ? "[cut off]" : ""}${a.unreadable ? `[${a.unreadable.length} unreadable]` : ""}${a.finish ? `{${a.finish}}` : a.cutoff || a.status === "short" || a.status === "empty" ? "{no finish}" : ""}${a.firstText !== undefined ? `@${a.firstText}ms` : ""}`)
     .join(" -> ");
   const answered = [...new Set(run.attempts.filter((a) => a.dishes).map((a) => a.model))].join("+") || "none";
-  const line = `[dishes] mode=${data.mode} got=${run.names.length}/${want} answered_by=${answered} chain=${chain} ms=${Date.now() - started}`;
+  const line = `[dishes] mode=${data.mode} time=${data.time} got=${run.names.length}/${want}${run.overTime ? ` (${run.overTime} over time limit)` : ""}${run.offTarget ? ` (${run.offTarget} off target)` : ""} answered_by=${answered} chain=${chain} ms=${Date.now() - started}`;
   if (run.names.length < want) {
     console.error(line, run.attempts.filter((a) => a.detail).map((a) => `${a.model}: ${a.detail}`).join(" | "));
   } else console.log(line);
   // What a model actually sent when we couldn't read it (search the logs for "unreadable").
   for (const a of run.attempts) {
     if (a.unreadable) console.warn(`[dishes] unreadable model=${a.model} sample=${a.unreadable.join(" | ")}`);
+    if (a.offNames) console.warn(`[dishes] off-target model=${a.model} ${a.offNames.join(" | ")}`);
+    if (a.slowNames) console.warn(`[dishes] too-slow time=${data.time} model=${a.model} ${a.slowNames.join(" | ")}`);
     if (a.cutoff) {
       console.warn(`[dishes] cut-off model=${a.model} finish=${a.finish || "none"} out_tokens=${a.outTokens ?? "?"} thought_tokens=${a.thoughtTokens ?? "?"} sample=${a.cutoff}`);
     }
@@ -455,7 +561,7 @@ export async function POST(request) {
 
   const data = v.data;
   const started = Date.now();
-  const run = { names: [], attempts: [], lastStatus: null, fatal: false, started };
+  const run = { names: [], attempts: [], slow: [], off: [], lastStatus: null, fatal: false, started };
   const dishes = dishesFromChain(data, request.signal, run);
 
   // Wait for the first dish before replying, so if every model fails we can still send a
