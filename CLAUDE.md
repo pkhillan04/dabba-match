@@ -21,7 +21,7 @@ A no-login web app: users set up a profile (body stats, goal, diet), pick ingred
 - `npm run dev` — local server at http://localhost:3000 using the real provider from `.env.local`.
 - After changing `api/` files, restart the dev server (Ctrl+C, `npm run dev`); the browser page reloads on its own, the server does not.
 - `npm run dev:mock` — same, with fake dishes (no API key, no cost). Prefer this while developing UI.
-- Deploy: push to `main` on GitHub (private repo `pkhillan04/dabba-match`); Vercel builds it automatically. `npx vercel --prod` still works for a manual deploy.
+- Deploy: push to `main` on GitHub (repo `pkhillan04/dabba-match`); Vercel builds it automatically. `npx vercel --prod` still works for a manual deploy.
 
 ## Key frontend concepts (public/index.html)
 - `state` object persisted to localStorage key `dabbamatch_v4` (`save()` / `load()`). `load()` migrates the older `dabbamatch_profile_v3` format. If you change the state shape, keep old data loading.

@@ -1,19 +1,92 @@
 # Dabba Match
 
-Cook with what you have. Hit your macros.
+**Live: https://dabba-match.vercel.app** — no login, works on a phone.
 
-Pick what's in your kitchen and get three dishes sized to your next meal's calories and protein. Targets are calculated from your body and goal (Mifflin-St Jeor + activity + goal pace). No login: each person's profile is saved in their own browser.
+Pick what's actually in your kitchen and get three dishes sized to your next
+meal's calorie and protein target. Built because I bulk-cook protein, get bored
+eating the same thing, and don't want to do arithmetic to find out whether a
+substitution still hits my macros.
+
+It's in real use by me and my sister. One HTML file, four serverless endpoints,
+no build step, no framework, no database.
+
+## The parts worth reading
+
+**Fitting a dish to your macros without lying about it** — `lib/nutrition.js`
+
+An LLM asked for "a dish with 45g protein and 600 kcal" will confidently return
+ingredient amounts whose macros don't add up. So the model's amounts are treated
+as a starting guess and then solved properly: each ingredient gets a multiplier,
+found by coordinate descent over ~12 sweeps against a built-in per-100g nutrition
+table.
+
+The bounds are the interesting bit. They're per ingredient type, because the
+scaling a real cook will accept isn't uniform — fat sources move within
+0.3–1.3x (doubling the ghee ruins the dish), low-calorie vegetables get
+0.7–1.5x, everything else 0.4–1.8x. Ingredients contributing under 15 kcal are
+pinned at 1x, since rescaling a pinch of salt is noise. A small penalty term
+keeps multipliers near 1 so the solver prefers small honest nudges over dramatic
+rewrites, and dry-basis ingredients get a cooked-weight conversion when the name
+says they're cooked.
+
+Then it rounds to amounts a kitchen can actually measure, **recomputes the macros
+from the rounded numbers**, and — the part I care about — **throws the result away**
+if ingredient coverage is under 80% or the fit didn't improve the error by at
+least 20%. A bad fit shows nothing rather than a confident wrong number.
+
+**A model fallback chain that respects the platform's deadline** — `lib/ai.js`
+
+Gemini's free tier returns 429s and 503s constantly, so requests walk a chain of
+models. The parts that took real debugging:
+
+- Vercel kills a serverless function at 60 seconds. The chain tracks total
+  elapsed time and refuses to start another model with under 5 seconds left,
+  so a user gets a clean error instead of a dead connection.
+- Retryable failures (404, 429, 500, 503) advance to the next model. A 401 or
+  403 aborts the whole chain immediately — a bad API key will not work better on
+  the next model, and burning the remaining budget to prove it is pointless.
+- Each attempt passes through a validator, so a response that parses as JSON but
+  is semantically wrong counts as a failure and falls through. Early on, models
+  would echo the target macros back as the dish's macros; that check catches it.
+- Every attempt is logged with its outcome, so production logs say which model
+  answered and why the earlier ones didn't.
+
+**Macro targets** — Mifflin-St Jeor BMR, activity multiplier, goal-pace
+adjustment, protein scaled by g/kg against goal, split across training and rest
+days. An earlier version had a bug where a "fast" pace applied +15% on top of an
+already-adjusted figure and quietly produced a 3,599 kcal target; it's covered in
+the calculator now.
+
+**Everything else:** cook mode with step timers that parse durations written as
+words, photo-based ingredient scanning, a calorie log, and a recently-cooked
+history so it stops suggesting the thing you ate yesterday.
 
 ## What's in this folder
 
 | Path | What it is |
 |---|---|
-| `public/index.html` | The whole app (design, onboarding, calculator, profile, results). One file, no build step. |
-| `api/dishes.js` | Server endpoint the app calls. Holds your secret AI key, builds the prompt, streams dishes back. |
-| `lib/prompt.js` | Checks what the app sends and writes the prompt for the AI. |
-| `dev-server.mjs` | Runs everything on your laptop for testing. |
-| `.env.example` | Template for your secret keys. Copy to `.env.local`. |
-| `CLAUDE.md` | Notes Claude Code reads automatically when you work on this project. |
+| `public/index.html` | The whole front end — design, onboarding, calculator, profile, results. One file, no build step. |
+| `api/dishes.js` | Main endpoint. Holds the AI key server-side, builds the prompt, streams dishes back over SSE. |
+| `api/recipe.js`, `api/food.js`, `api/scan.js` | Recipe detail, food logging, photo ingredient scan. |
+| `lib/ai.js` | Provider abstraction, model fallback chain, rate limiting, JSON extraction. |
+| `lib/nutrition.js` | Nutrition table, macro recomputation, `fitToTarget`. |
+| `lib/dish.js` | Dish validation and cooking-time checks. |
+| `lib/prompt.js` | Validates the request and writes the prompt. |
+| `dev-server.mjs` | Local dev server. |
+| `CLAUDE.md` | Project notes for Claude Code sessions. |
+
+## Honest notes
+
+- The nutrition table is hand-built and Indian-ingredient-heavy. Unknown
+  ingredients reduce coverage, and low coverage makes the fitter decline rather
+  than guess.
+- Profiles live in `localStorage`. Clear your browser and you start over. There
+  is no account system and no server-side storage of anything personal.
+- On Gemini's free tier, Google may use prompts to improve its models. Prompts
+  carry macros, ingredients and diet choices — never names.
+- This is a nutrition estimator, not dietary advice.
+
+Built with Claude as a coding partner.
 
 ## One-time setup (about 15 minutes)
 
